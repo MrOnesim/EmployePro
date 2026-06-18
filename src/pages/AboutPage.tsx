@@ -1,13 +1,4 @@
-import { Globe, Users, Shield, Zap, Clock, Heart, Target, ArrowRight, MapPin, CheckCircle, CreditCard, Smartphone, Building2, BookOpen, HeadphonesIcon, BarChart3, Briefcase, DollarSign, FileText, MessageSquare, Gift, Monitor } from 'lucide-react';
-
-const values = [
-  { icon: Globe, title: 'Global', desc: 'Disponible dans 60+ pays avec conformité locale', color: 'from-blue-500 to-blue-600' },
-  { icon: Users, title: "Centré sur l'humain", desc: 'Les employés sont au cœur de chaque fonctionnalité', color: 'from-green-500 to-green-600' },
-  { icon: Shield, title: 'Sécurité', desc: 'Données protégées avec chiffrement et 2FA', color: 'from-purple-500 to-purple-600' },
-  { icon: Zap, title: 'Innovation', desc: 'IA embarquée pour des analyses RH avancées', color: 'from-orange-500 to-orange-600' },
-  { icon: Clock, title: 'Efficacité', desc: 'Automatisez vos processus RH en un clic', color: 'from-teal-500 to-teal-600' },
-  { icon: Heart, title: 'Bienveillance', desc: 'QVT et bien-être au travail prioritaires', color: 'from-pink-500 to-pink-600' },
-];
+import { Users, Shield, Clock, Heart, Target, ArrowRight, MapPin, CheckCircle, CreditCard, Building2, BookOpen, HeadphonesIcon, BarChart3, Briefcase, DollarSign, FileText, MessageSquare, Gift, Monitor, Zap } from 'lucide-react';
 
 const team = [
   { name: 'Amadou Diallo', role: 'CEO & Co-fondateur', bio: 'Ex-directeur RH chez Orange, expert en transformation RH', location: 'Sénégal' },
