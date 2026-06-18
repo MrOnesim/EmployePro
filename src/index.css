@@ -31,25 +31,9 @@
   75% { transform: translateX(5px); }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  33% { transform: translateY(-15px) rotate(5deg); }
-  66% { transform: translateY(5px) rotate(-3deg); }
-}
-
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 20px rgba(255,255,255,0.1); }
   50% { box-shadow: 0 0 40px rgba(255,255,255,0.2); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes wave {
-  0%, 100% { d: path('M0,60 C200,120 400,0 600,60 C800,120 1000,0 1200,60 L1200,120 L0,120 Z'); }
-  50% { d: path('M0,80 C200,20 400,100 600,40 C800,20 1000,100 1200,80 L1200,120 L0,120 Z'); }
 }
 
 .animate-fade-in {
@@ -68,22 +52,8 @@
   animation: shake 0.5s ease-in-out;
 }
 
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-}
-
 .animate-pulse-glow {
   animation: pulse-glow 3s ease-in-out infinite;
-}
-
-.shimmer {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-.animate-wave svg path {
-  animation: wave 6s ease-in-out infinite;
 }
 
 @keyframes toast-in {
