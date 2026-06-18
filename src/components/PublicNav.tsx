@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function PublicNav() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const isPublic = ['/', '/pricing', '/faq', '/about', '/login', '/register-company'].includes(location.pathname);
   if (!isPublic) return null;
 
   const links = [
-    { to: '/', label: 'Accueil' },
-    { to: '/pricing', label: 'Tarifs' },
-    { to: '/about', label: 'À propos' },
-    { to: '/faq', label: 'FAQ' },
+    { to: '/', label: t('nav.home') },
+    { to: '/pricing', label: t('nav.pricing') },
+    { to: '/about', label: t('nav.about') },
+    { to: '/faq', label: t('nav.faq') },
   ];
 
   return (
@@ -38,11 +41,12 @@ export default function PublicNav() {
 
           {/* Desktop auth */}
           <div className="hidden md:flex items-center space-x-3">
+            <LanguageSwitcher />
             <Link to="/login" className="text-sm font-medium text-gray-600 hover:text-gray-800 px-4 py-2">
-              Se connecter
+              {t('nav.login')}
             </Link>
             <Link to="/register-company" className="bg-blue-600 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-colors">
-              Commencer
+              {t('nav.get_started')}
             </Link>
           </div>
 
@@ -65,10 +69,11 @@ export default function PublicNav() {
             </Link>
           ))}
           <div className="pt-2 border-t border-gray-100 space-y-2">
+            <div className="px-4 py-2"><LanguageSwitcher /></div>
             <Link to="/login" onClick={() => setOpen(false)}
-              className="block px-4 py-3 text-sm font-medium text-gray-600">Se connecter</Link>
+              className="block px-4 py-3 text-sm font-medium text-gray-600">{t('nav.login')}</Link>
             <Link to="/register-company" onClick={() => setOpen(false)}
-              className="block px-4 py-3 text-sm font-medium bg-blue-600 text-white rounded-lg text-center">Commencer</Link>
+              className="block px-4 py-3 text-sm font-medium bg-blue-600 text-white rounded-lg text-center">{t('nav.get_started')}</Link>
           </div>
         </div>
       )}

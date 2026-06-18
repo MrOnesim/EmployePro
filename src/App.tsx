@@ -10,6 +10,7 @@ import type { UserRole } from './types';
 
 const LandingPage = React.lazy(() => import('./pages/LandingPage'));
 const LoginPage = React.lazy(() => import('./pages/LoginPage'));
+const NotFoundPage = React.lazy(() => import('./pages/NotFoundPage'));
 const RegisterCompanyPage = React.lazy(() => import('./pages/RegisterCompanyPage'));
 const EmployeeInvitationPage = React.lazy(() => import('./pages/EmployeeInvitationPage'));
 const FAQPage = React.lazy(() => import('./pages/FAQPage'));
@@ -136,7 +137,7 @@ function AppRoutes() {
           <Route path="/" element={<ProtectedRoute adminOnly><><Navigate to="/admin" replace /></></ProtectedRoute>} />
           <Route path="/employee-dashboard" element={<ProtectedRoute><><Navigate to="/employee" replace /></></ProtectedRoute>} />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </ErrorBoundary>

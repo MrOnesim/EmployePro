@@ -11,8 +11,11 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Layout() {
+  const { t } = useTranslation();
   const { currentUser, currentCompany, logout, notifications, markNotificationRead } = useApp();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
@@ -188,10 +191,12 @@ export default function Layout() {
           </div>
 
           <div className="flex items-center space-x-2">
+            {/* Language switcher */}
+            <LanguageSwitcher />
             {/* Dark mode toggle */}
             <button onClick={toggleTheme}
               className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-              title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}>
+              title={theme === 'dark' ? t('layout.theme_light') : t('layout.theme_dark')}>
               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
             </button>
 
