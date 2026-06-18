@@ -203,14 +203,6 @@ export default function LandingPage() {
               </button>
             </div>
 
-            {/* Floating badges */}
-            <div className="mt-12 flex flex-wrap gap-3">
-              {['✓ Gratuit pour commencer', '✓ 60+ pays', '✓ Support 24/7', '✓ IA intégrée'].map((badge, i) => (
-                <div key={i} className="bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm border border-white/10 animate-float" style={{ animationDelay: `${i * 0.5}s` }}>
-                  {badge}
-                </div>
-              ))}
-            </div>
           </div>
 
           <div className="relative">
