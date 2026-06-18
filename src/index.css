@@ -2,6 +2,8 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+html { scroll-behavior: smooth; }
+
 @theme {
   --color-primary: #2563eb;
   --color-primary-dark: #1d4ed8;
