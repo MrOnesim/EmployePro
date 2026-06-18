@@ -4,22 +4,50 @@ import { Check, ArrowRight } from 'lucide-react';
 
 const plans = [
   {
-    name: 'Gratuit', price: '0', period: 'Toujours',
+    name: 'Gratuit',
+    price: '0',
+    period: 'Toujours',
     desc: 'Pour découvrir EmployéPro en toute liberté.',
     featured: false,
-    features: ['Jusqu\'à 10 employés', 'Gestion RH de base', 'Paie simple', '1 pays', 'Support email'],
+    features: [
+      "Jusqu'à 10 employés",
+      'Gestion RH de base',
+      'Paie simple',
+      '1 pays',
+      'Support email',
+    ],
   },
   {
-    name: 'Pro', price: '49', period: '/mois',
+    name: 'Pro',
+    price: '49',
+    period: '/mois',
     desc: 'Pour les PME en croissance. Pas de facturation par employé.',
     featured: true,
-    features: ['Employés illimités', 'Tous les modules RH', 'Paie multi-pays', 'Assistant IA', 'Signature électronique', 'Support prioritaire 24/7', 'API & Intégrations'],
+    features: [
+      'Employés illimités',
+      'Tous les modules RH',
+      'Paie multi-pays',
+      'Assistant IA',
+      'Signature électronique',
+      'Support prioritaire 24/7',
+      'API & Intégrations',
+    ],
   },
   {
-    name: 'Entreprise', price: 'Sur mesure', period: '',
+    name: 'Entreprise',
+    price: 'Sur mesure',
+    period: '',
     desc: 'Pour les grands groupes et administrations.',
     featured: false,
-    features: ['Tout le plan Pro', 'Multi-entreprises', 'Data center dédié', 'SLA 99.99%', 'Audit & Conformité', 'Formation on-site', 'Account manager dédié'],
+    features: [
+      'Tout le plan Pro',
+      'Multi-entreprises',
+      'Data center dédié',
+      'SLA 99.99%',
+      'Audit & Conformité',
+      'Formation on-site',
+      'Account manager dédié',
+    ],
   },
 ];
 
@@ -27,8 +55,11 @@ export default function PricingSection() {
   const { ref, isVisible } = useScrollReveal();
 
   return (
-    <section className="py-28 bg-white relative overflow-hidden">
-      <div ref={ref} className={`max-w-7xl mx-auto px-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+    <section id="pricing" className="py-28 bg-white relative overflow-hidden">
+      <div
+        ref={ref}
+        className={`max-w-7xl mx-auto px-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+      >
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-100 mb-6">
             <span className="text-sm font-medium text-green-600">Tarifs transparents</span>
@@ -47,7 +78,7 @@ export default function PricingSection() {
               key={plan.name}
               className={`relative rounded-3xl p-8 border-2 transition-all duration-300 ${
                 plan.featured
-                  ? 'border-blue-500 shadow-xl shadow-blue-600/10 scale-105 md:scale-105 bg-white'
+                  ? 'border-blue-500 shadow-xl shadow-blue-600/10 md:scale-105 bg-white'
                   : 'border-gray-100 bg-white hover:border-gray-200'
               }`}
             >
@@ -80,11 +111,15 @@ export default function PricingSection() {
                     : 'border-2 border-gray-200 text-gray-700 hover:border-gray-300'
                 }`}
               >
-                {plan.name === 'Gratuit' ? 'Commencer' : plan.name === 'Pro' ? (
+                {plan.name === 'Gratuit' ? (
+                  'Commencer'
+                ) : plan.name === 'Pro' ? (
                   <span className="flex items-center justify-center gap-2">
                     Essai gratuit <ArrowRight size={16} />
                   </span>
-                ) : 'Nous contacter'}
+                ) : (
+                  'Nous contacter'
+                )}
               </Link>
             </div>
           ))}

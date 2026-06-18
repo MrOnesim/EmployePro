@@ -1,5 +1,4 @@
 import HeroSection from '../components/landing/HeroSection';
-import ClientsSection from '../components/landing/ClientsSection';
 import FeaturesSection from '../components/landing/FeaturesSection';
 import DashboardSection from '../components/landing/DashboardSection';
 import ComparisonSection from '../components/landing/ComparisonSection';
@@ -10,12 +9,12 @@ import TestimonialsSection from '../components/landing/TestimonialsSection';
 import PricingSection from '../components/landing/PricingSection';
 import FAQSection from '../components/landing/FAQSection';
 import CTASection from '../components/landing/CTASection';
+import FooterSection from '../components/landing/FooterSection';
 
 export default function LandingPage() {
   return (
     <div>
       <HeroSection />
-      <ClientsSection />
       <FeaturesSection />
       <DashboardSection />
       <ComparisonSection />
@@ -26,6 +25,7 @@ export default function LandingPage() {
       <PricingSection />
       <FAQSection />
       <CTASection />
+      <FooterSection />
     </div>
   );
 }

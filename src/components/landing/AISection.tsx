@@ -5,13 +5,15 @@ const examples = [
   {
     icon: BarChart3,
     question: 'Quels employés sont les plus performants ce trimestre ?',
-    answer: 'Amadou Diallo (95%), Marie Dubois (92%), Jean Nkosi (88%) — détails disponibles dans le rapport ci-joint.',
+    answer:
+      'Amadou Diallo (95%), Marie Dubois (92%), Jean Nkosi (88%) — détails disponibles dans le rapport ci-joint.',
     delay: 0,
   },
   {
     icon: FileText,
     question: 'Génère le rapport RH du mois dernier.',
-    answer: 'Rapport généré : 14 recrutements, 98.2% présence, 2.4M FCFA masse salariale. Envoyé par email.',
+    answer:
+      'Rapport généré : 14 recrutements, 98.2% présence, 2.4M FCFA masse salariale. Envoyé par email.',
     delay: 200,
   },
   {
@@ -27,7 +29,10 @@ export default function AISection() {
 
   return (
     <section className="py-28 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
-      <div ref={ref} className={`relative max-w-7xl mx-auto px-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <div
+        ref={ref}
+        className={`relative max-w-7xl mx-auto px-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+      >
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 border border-purple-100 mb-6">
             <Sparkles size={14} className="text-purple-600" />
@@ -37,7 +42,8 @@ export default function AISection() {
             Votre assistant RH intelligent
           </h2>
           <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-            Posez des questions, générez des rapports et prenez des décisions éclairées avec notre IA embarquée.
+            Posez des questions, générez des rapports et prenez des décisions éclairées avec notre
+            IA embarquée.
           </p>
         </div>
 
@@ -59,7 +65,11 @@ export default function AISection() {
 
           <div className="bg-white border border-gray-200 border-t-0 rounded-b-3xl p-6 space-y-6 shadow-sm">
             {examples.map((ex, i) => (
-              <div key={i} className="space-y-3" style={{ animationDelay: `${ex.delay}ms` }}>
+              <div
+                key={i}
+                className="space-y-3 animate-stagger"
+                style={{ animationDelay: `${i * 300}ms` }}
+              >
                 <div className="flex items-start gap-3 justify-end">
                   <div className="bg-blue-50 rounded-2xl rounded-br-sm px-5 py-3 max-w-[80%] border border-blue-100">
                     <div className="flex items-center gap-2 mb-1">
