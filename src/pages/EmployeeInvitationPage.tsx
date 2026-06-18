@@ -62,8 +62,8 @@ export default function EmployeeInvitationPage() {
       <div className="max-w-lg mx-auto">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl shadow-lg shadow-blue-200 mb-4">
-            <span className="text-white font-bold text-2xl">EP</span>
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-lg shadow-blue-200 mb-4">
+            <img src="/images/logo.png" alt="EmployéPro" className="w-16 h-16 rounded-xl object-cover" />
           </div>
           <p className="text-gray-500">EmployéPro Africa</p>
         </div>

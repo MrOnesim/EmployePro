@@ -70,8 +70,8 @@ export default function LoginPage() {
 
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl shadow-lg mb-4 border border-white/30 animate-pulse-glow">
-            <span className="text-white font-bold text-3xl">EP</span>
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl shadow-lg mb-4 border border-white/30 animate-pulse-glow relative">
+            <img src="/images/logo.png" alt="EmployéPro" className="w-16 h-16 rounded-xl object-cover" />
             <Sparkles size={16} className="absolute -top-1 -right-1 text-yellow-300 animate-spin" style={{ animationDuration: '3s' }} />
           </div>
           <h1 className="text-3xl font-black text-white mb-2">EmployePro</h1>

@@ -131,8 +131,8 @@ export default function RegisterCompanyPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 py-8 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
-          <Link to="/login" className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl shadow-lg shadow-blue-200 mb-4">
-            <span className="text-white font-bold text-2xl">EP</span>
+          <Link to="/login" className="inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-lg shadow-blue-200 mb-4">
+            <img src="/images/logo.png" alt="EmployéPro" className="w-16 h-16 rounded-xl object-cover" />
           </Link>
           <h1 className="text-2xl font-bold text-gray-800">Creer votre entreprise</h1>
           <p className="text-gray-500 mt-1">Rejoignez EmployePro - Plateforme RH Globale</p>

@@ -94,9 +94,7 @@ export default function Layout() {
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-4 bg-blue-800/50">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
-                <span className="text-blue-600 font-bold text-lg">EP</span>
-              </div>
+              <img src="/images/logo.png" alt="EmployéPro" className="w-10 h-10 rounded-xl object-cover" />
               <span className="text-white font-semibold text-lg hidden sm:block">EmployéPro</span>
             </Link>
             <button 

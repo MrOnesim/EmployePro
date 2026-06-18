@@ -402,9 +402,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">EP</span>
-                </div>
+                <img src="/images/logo.png" alt="EmployéPro" className="w-10 h-10 rounded-xl object-cover" />
                 <span className="text-xl font-bold">EmployePro</span>
               </div>
               <p className="text-gray-400 text-sm">

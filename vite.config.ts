@@ -14,7 +14,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["images/icon.svg"],
+      includeAssets: ["images/icon.svg", "images/logo.png"],
       manifest: {
         name: "EmployéPro Africa",
         short_name: "EmployéPro",
