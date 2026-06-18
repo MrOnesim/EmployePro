@@ -5,3 +5,6 @@ dist/
 .env
 .env.local
 coverage/
+.refact/
+*.tsbuildinfo
+*.tgz
