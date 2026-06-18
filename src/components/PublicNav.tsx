@@ -20,9 +20,7 @@ export default function PublicNav() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">EP</span>
-            </div>
+            <img src="/images/logo.png" alt="EmployéPro" className="w-9 h-9 rounded-lg object-cover" />
             <span className="font-bold text-gray-800 text-lg">EmployePro</span>
           </Link>
 
