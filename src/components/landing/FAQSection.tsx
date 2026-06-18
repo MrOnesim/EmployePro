@@ -16,25 +16,17 @@ const faqs = [
   { q: 'Le support est-il disponible en français ?', a: 'Oui, notre support est disponible en français, anglais, arabe et portugais. Assistance par chat, email et téléphone 24/7.' },
 ];
 
-function FAQItem({ faq, index }: { faq: typeof faqs[0]; index: number }) {
+function FAQItem({ faq }: { faq: typeof faqs[0] }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className={`border-b border-white/[0.06] last:border-0 animate-fade-in`} style={{ animationDelay: `${index * 50}ms` }}>
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between py-5 text-left group"
-      >
-        <span className="text-base font-medium text-gray-200 group-hover:text-white transition-colors pr-4">
-          {faq.q}
-        </span>
-        <ChevronDown
-          size={18}
-          className={`text-gray-500 shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
-        />
+    <div className="border-b border-gray-100 last:border-0">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-5 text-left group">
+        <span className="text-base font-medium text-gray-700 group-hover:text-gray-900 transition-colors pr-4">{faq.q}</span>
+        <ChevronDown size={18} className={`text-gray-400 shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
       </button>
       <div className={`overflow-hidden transition-all duration-300 ${open ? 'max-h-96 pb-5' : 'max-h-0'}`}>
-        <p className="text-gray-400 text-sm leading-relaxed">{faq.a}</p>
+        <p className="text-gray-500 text-sm leading-relaxed">{faq.a}</p>
       </div>
     </div>
   );
@@ -44,23 +36,23 @@ export default function FAQSection() {
   const { ref, isVisible } = useScrollReveal();
 
   return (
-    <section className="py-28 bg-[#0a0e27]">
+    <section className="py-28 bg-gradient-to-b from-gray-50 to-white">
       <div ref={ref} className={`max-w-3xl mx-auto px-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-500/20 bg-gray-500/10 backdrop-blur-sm mb-6">
-            <span className="text-sm font-medium text-gray-300">FAQ</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 border border-gray-200 mb-6">
+            <span className="text-sm font-medium text-gray-600">FAQ</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-black text-gray-800 mb-4 tracking-tight">
             Questions fréquentes
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-500 text-lg max-w-2xl mx-auto">
             Tout ce que vous devez savoir sur EmployéPro Africa.
           </p>
         </div>
 
-        <div className="bg-white/[0.02] rounded-3xl px-6 border border-white/[0.06]">
+        <div className="bg-white rounded-3xl px-6 border border-gray-100 shadow-sm">
           {faqs.map((faq, i) => (
-            <FAQItem key={i} faq={faq} index={i} />
+            <FAQItem key={i} faq={faq} />
           ))}
         </div>
       </div>

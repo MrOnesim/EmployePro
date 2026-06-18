@@ -13,9 +13,9 @@ export default function ClientsSection() {
   const { ref, isVisible } = useScrollReveal();
 
   return (
-    <section className="py-20 bg-[#0a0e27] border-t border-white/[0.04]">
+    <section className="py-20 bg-white border-b border-gray-100">
       <div ref={ref} className={`max-w-6xl mx-auto px-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <p className="text-center text-sm font-medium text-gray-500 uppercase tracking-wider mb-12">
+        <p className="text-center text-sm font-medium text-gray-400 uppercase tracking-wider mb-12">
           Ils nous font confiance
         </p>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-8 items-center">
@@ -25,7 +25,7 @@ export default function ClientsSection() {
                 <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${client.color} flex items-center justify-center`}>
                   <span className="text-white font-bold text-xs">{client.name.charAt(0)}</span>
                 </div>
-                <span className="text-gray-400 font-semibold text-sm group-hover:text-gray-300 transition-colors">
+                <span className="text-gray-500 font-semibold text-sm group-hover:text-gray-700 transition-colors">
                   {client.name}
                 </span>
               </div>

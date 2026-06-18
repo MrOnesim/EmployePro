@@ -13,7 +13,7 @@ import CTASection from '../components/landing/CTASection';
 
 export default function LandingPage() {
   return (
-    <div className="bg-[#0a0e27]">
+    <div>
       <HeroSection />
       <ClientsSection />
       <FeaturesSection />

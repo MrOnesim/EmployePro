@@ -22,17 +22,17 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
   return (
     <div
       ref={ref}
-      className={`group relative bg-white/[0.03] backdrop-blur-sm rounded-2xl p-6 border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.12] transition-all duration-500 cursor-default ${
+      className={`group relative bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-500 cursor-default ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       }`}
       style={{ transitionDelay: `${index * 80}ms` }}
     >
-      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-md`}>
         <feature.icon size={22} className="text-white" />
       </div>
-      <h3 className="text-lg font-bold text-white mb-2">{feature.title}</h3>
-      <p className="text-gray-400 text-sm leading-relaxed">{feature.desc}</p>
-      <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 scale-x-0 group-hover:scale-x-100 origin-center" />
+      <h3 className="text-lg font-bold text-gray-800 mb-2">{feature.title}</h3>
+      <p className="text-gray-500 text-sm leading-relaxed">{feature.desc}</p>
+      <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
     </div>
   );
 }
@@ -41,19 +41,16 @@ export default function FeaturesSection() {
   const { ref, isVisible } = useScrollReveal();
 
   return (
-    <section className="py-28 bg-[#0a0e27] relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/[0.02] to-transparent" />
-
+    <section className="py-28 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
       <div ref={ref} className={`relative max-w-7xl mx-auto px-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-400/20 bg-blue-500/10 backdrop-blur-sm mb-6">
-            <span className="text-sm font-medium text-blue-300">Fonctionnalités</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 mb-6">
+            <span className="text-sm font-medium text-blue-600">Fonctionnalités</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-black text-gray-800 mb-4 tracking-tight">
             Tout ce dont vous avez besoin
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-500 text-lg max-w-2xl mx-auto">
             Une suite complète de 12 modules RH intégrés pour gérer votre entreprise efficacement.
           </p>
         </div>
