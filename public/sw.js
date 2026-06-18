@@ -1,4 +1,3 @@
-const CACHE_NAME = 'ep-v3';
 const STATIC_CACHE = 'ep-static-v3';
 const DYNAMIC_CACHE = 'ep-dynamic-v3';
 

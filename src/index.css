@@ -2,6 +2,17 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-light: #60a5fa;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --font-sans: system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, monospace;
+}
+
 /* ===== Animations globales ===== */
 
 @keyframes fade-in {

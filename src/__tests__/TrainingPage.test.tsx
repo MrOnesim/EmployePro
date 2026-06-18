@@ -20,9 +20,12 @@ vi.mock('../context/AppContext', () => ({
       },
     ],
     enrollments: [],
+    quizzes: [],
+    certificates: [],
     currentUser: { id: '1', firstName: 'Kofi', lastName: 'Mensah' },
     enrollCourse: vi.fn(),
     updateLessonProgress: vi.fn(),
+    submitQuizAttempt: vi.fn(),
   }),
 }));
 
@@ -31,13 +34,13 @@ vi.mock('../context/ToastContext', () => ({
 }));
 
 describe('TrainingPage', () => {
-  it('renders catalogue and mes formations tabs', () => {
+  it('renders tabs', () => {
     render(<TrainingPage />);
     expect(screen.getByText('Catalogue')).toBeInTheDocument();
     expect(screen.getByText('Mes formations')).toBeInTheDocument();
   });
 
-  it('shows course cards when data is provided', () => {
+  it('shows course cards', () => {
     render(<TrainingPage />);
     expect(screen.getByText('Introduction à React')).toBeInTheDocument();
     expect(screen.getByText('Kwame Adjei')).toBeInTheDocument();
