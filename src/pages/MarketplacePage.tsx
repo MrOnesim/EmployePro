@@ -38,6 +38,7 @@ export default function MarketplacePage() {
   const [typeFilter, setTypeFilter] = useState('');
   const [showCreate, setShowCreate] = useState(false);
 
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: '',
     company: currentCompany?.name || '',
@@ -67,10 +68,15 @@ export default function MarketplacePage() {
 
   const handleCreate = () => {
     if (!form.title || !form.description) return;
-    addJobPost({
-      ...form,
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-    });
+    if (editingPostId) {
+      updateJobPost(editingPostId, form);
+    } else {
+      addJobPost({
+        ...form,
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      });
+    }
+    setEditingPostId(null);
     setForm({
       title: '',
       company: currentCompany?.name || '',
@@ -88,7 +94,7 @@ export default function MarketplacePage() {
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     });
     setShowCreate(false);
-    addToast('Offre publiée avec succès', 'success');
+    addToast(editingPostId ? 'Offre mise à jour' : 'Offre publiée avec succès', 'success');
   };
 
   const handleToggleStatus = (post: JobPost) => {
@@ -183,7 +189,7 @@ export default function MarketplacePage() {
                         className={`p-2 rounded-lg transition-colors ${post.featured ? 'text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20' : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'}`}>
                         <Star size={18} className={post.featured ? 'fill-yellow-500' : ''} />
                       </button>
-                      <button onClick={() => { setForm({ title: post.title, company: post.company, companyId: post.companyId, description: post.description, requirements: post.requirements, location: post.location, type: post.type, salary: post.salary, category: post.category, status: post.status, featured: post.featured, views: post.views, applications: post.applications, expiresAt: post.expiresAt }); setShowCreate(true); }}
+                      <button onClick={() => { setEditingPostId(post.id); setForm({ title: post.title, company: post.company, companyId: post.companyId, description: post.description, requirements: post.requirements, location: post.location, type: post.type, salary: post.salary, category: post.category, status: post.status, featured: post.featured, views: post.views, applications: post.applications, expiresAt: post.expiresAt }); setShowCreate(true); }}
                         className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
                         <Edit2 size={18} />
                       </button>
@@ -270,7 +276,7 @@ export default function MarketplacePage() {
         </>
       )}
 
-      <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Publier une offre d'emploi" maxWidth="xl">
+      <Modal open={showCreate} onClose={() => { setEditingPostId(null); setShowCreate(false); }} title="Publier une offre d'emploi" maxWidth="xl">
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
@@ -326,7 +332,7 @@ export default function MarketplacePage() {
             </div>
           </div>
           <div className="flex space-x-3 pt-2">
-            <button onClick={() => setShowCreate(false)} className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2.5 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600">Annuler</button>
+            <button onClick={() => { setEditingPostId(null); setShowCreate(false); }} className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2.5 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600">Annuler</button>
             <button onClick={handleCreate} className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700">Publier l'offre</button>
           </div>
         </div>

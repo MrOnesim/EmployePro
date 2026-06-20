@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Check, X, Star, Shield, Zap, Crown, Users, DollarSign, BarChart3, MessageSquare, HelpCircle, ArrowRight, Sparkles } from 'lucide-react';
+import FooterSection from '../components/landing/FooterSection';
 
 interface Plan {
   name: string;
@@ -267,6 +268,7 @@ export default function PricingPage() {
           </div>
         </div>
       </section>
+      <FooterSection />
     </div>
   );
 }

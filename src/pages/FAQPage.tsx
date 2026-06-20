@@ -1,5 +1,6 @@
 import { useState, type ElementType } from 'react';
 import { ChevronDown, Globe, Users, DollarSign, Calendar, Bot, Shield, Headphones, BookOpen, Mail, Phone, Search } from 'lucide-react';
+import FooterSection from '../components/landing/FooterSection';
 
 interface FAQItem {
   category: string;
@@ -242,6 +243,7 @@ export default function FAQPage() {
           50% { opacity: 1; }
         }
       `}</style>
+      <FooterSection />
     </div>
   );
 }

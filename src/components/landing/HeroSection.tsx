@@ -21,8 +21,10 @@ export default function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 overflow-hidden pb-12 md:pb-20"
+      className="relative min-h-screen flex items-center bg-cover bg-center overflow-hidden pb-12 md:pb-20"
+      style={{ backgroundImage: "url('/images/bg-hero.jpg')" }}
     >
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 via-blue-700/85 to-indigo-800/90" />
       {/* Decorative circles */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
       <div

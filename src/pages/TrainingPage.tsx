@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { BookOpen, Play, CheckCircle, Clock, User, BarChart3, Plus, Search, ClipboardCheck, Award, GraduationCap, ChevronRight, FileDown, XCircle } from 'lucide-react';
@@ -36,6 +36,13 @@ export default function TrainingPage() {
   const [quizAnswers, setQuizAnswers] = useState<number[]>([]);
   const [quizResult, setQuizResult] = useState<QuizAttempt | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const confettiTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (confettiTimerRef.current) clearTimeout(confettiTimerRef.current);
+    };
+  }, []);
 
   const userEnrollments = enrollments.filter((e) => e.employeeId === currentUser?.id);
 
@@ -85,7 +92,7 @@ export default function TrainingPage() {
     if (result.passed) {
       setShowConfetti(true);
       addToast('Félicitations ! Certificat émis avec succès', 'success');
-      setTimeout(() => setShowConfetti(false), 4000);
+      confettiTimerRef.current = setTimeout(() => setShowConfetti(false), 4000);
     }
   };
 

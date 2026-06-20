@@ -1,4 +1,5 @@
 import { Users, Shield, Clock, Heart, Target, ArrowRight, MapPin, CheckCircle, CreditCard, Building2, BookOpen, HeadphonesIcon, BarChart3, Briefcase, DollarSign, FileText, MessageSquare, Gift, Monitor, Zap } from 'lucide-react';
+import FooterSection from '../components/landing/FooterSection';
 
 const team = [
   { name: 'Amadou Diallo', role: 'CEO & Co-fondateur', bio: 'Ex-directeur RH chez Orange, expert en transformation RH', location: 'Sénégal' },
@@ -374,6 +375,7 @@ export default function AboutPage() {
         </a>
         <p className="text-gray-400 text-sm mt-4">Sans engagement • Annulation à tout moment</p>
       </section>
+      <FooterSection />
     </div>
   );
 }

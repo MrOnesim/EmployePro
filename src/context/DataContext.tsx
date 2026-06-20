@@ -982,9 +982,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
     eventBus.emit(EVENTS.ADVANCE_APPROVED);
   };
   const paySalaryAdvance = (id: string) => {
+    const advance = salaryAdvances.find(a => a.id === id);
     setSalaryAdvances(prev => prev.map(a => a.id === id ? { ...a, status: 'paid', paidAt: new Date() } : a));
     eventBus.emit(EVENTS.ADVANCE_PAID);
-    addSalaryTransfer({ employeeId: salaryAdvances.find(a => a.id === id)?.employeeId || '', amount: salaryAdvances.find(a => a.id === id)?.amount || 0, currency: 'FCFA', type: 'advance', status: 'completed', description: 'Avance sur salaire' });
+    if (advance) {
+      addSalaryTransfer({ employeeId: advance.employeeId, amount: advance.amount, currency: 'FCFA', type: 'advance', status: 'completed', description: 'Avance sur salaire' });
+    }
   };
   const rejectSalaryAdvance = (id: string) => {
     setSalaryAdvances(prev => prev.map(a => a.id === id ? { ...a, status: 'rejected', rejectedAt: new Date() } : a));
@@ -1001,10 +1004,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const quiz = quizzes.find(q => q.id === attempt.quizId);
     const totalPoints = quiz?.questions.reduce((s, q) => s + q.points, 0) || 0;
     let score = 0;
-    quiz?.questions.forEach((q, i) => {
-      if (attempt.answers[i] === q.correctAnswer) score += q.points;
-    });
-    const passed = score >= (quiz?.passingScore || totalPoints);
+    if (quiz?.questions && quiz.questions.length > 0) {
+      quiz.questions.forEach((q, i) => {
+        if (attempt.answers[i] === q.correctAnswer) score += q.points;
+      });
+    }
+    const passed = totalPoints > 0 && score >= (quiz?.passingScore || totalPoints);
     const newAttempt: QuizAttempt = { ...attempt, id: String(Date.now()), score, totalPoints, passed, startedAt: new Date(), completedAt: new Date() };
     setQuizAttempts(prev => [...prev, newAttempt]);
     eventBus.emit(EVENTS.QUIZ_COMPLETED);
@@ -1035,15 +1040,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const signDocumentFn = (requestId: string, recipientEmployeeId: string, signatureDataUrl: string) => {
+    let allSigned = false;
     setSignatureRequests(prev => prev.map(req => {
       if (req.id !== requestId) return req;
       const updatedRecipients = req.recipients.map(r =>
         r.employeeId === recipientEmployeeId ? { ...r, status: 'signed' as const, signedAt: new Date(), signatureDataUrl } : r
       );
-      const allSigned = updatedRecipients.every(r => r.status === 'signed');
+      allSigned = updatedRecipients.every(r => r.status === 'signed');
       return { ...req, recipients: updatedRecipients, status: allSigned ? 'completed' as const : 'signed' as const, completedAt: allSigned ? new Date() : req.completedAt };
     }));
-    if (signatureRequests.find(req => req.id === requestId)?.recipients.every(r => r.employeeId === recipientEmployeeId ? true : r.status === 'signed')) {
+    if (allSigned) {
       eventBus.emit(EVENTS.SIGNATURE_COMPLETED);
     } else {
       eventBus.emit(EVENTS.SIGNATURE_SIGNED);
