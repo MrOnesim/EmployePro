@@ -8,11 +8,15 @@ export async function subscribeToPush() {
   const reg = await navigator.serviceWorker.ready;
   if (!reg.pushManager) return;
 
+  const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+  if (!vapidKey) {
+    console.warn('VITE_VAPID_PUBLIC_KEY non défini — notifications push désactivées');
+    return;
+  }
+
   let sub = await reg.pushManager.getSubscription();
   if (!sub) {
-    const key = urlBase64ToUint8Array(
-      import.meta.env.VITE_VAPID_PUBLIC_KEY || 'BEl62iZR8wRg9P0p8o0q8wRg9P0p8o0q8wRg9P0p8o0q8wRg9P0p8o0q8'
-    );
+    const key = urlBase64ToUint8Array(vapidKey);
     sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: key,

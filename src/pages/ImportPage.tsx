@@ -1,12 +1,12 @@
 import { useState, useRef } from 'react';
-import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import { Upload, FileText, CheckCircle } from 'lucide-react';
 import { parseCSV } from '../utils/csv';
 import type { Employee } from '../types';
 
 export default function ImportPage() {
-  const { addMultipleEmployees } = useApp();
+  const { addMultipleEmployees } = useData();
   const { addToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<Record<string, string>[]>([]);

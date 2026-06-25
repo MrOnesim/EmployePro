@@ -6,14 +6,23 @@ export default function CTASection() {
   const { ref, isVisible } = useScrollReveal();
 
   return (
-    <section className="relative py-32 bg-gradient-to-br from-blue-600 to-indigo-700 overflow-hidden">
+    <section className="relative py-32 bg-gradient-to-br from-blue-600 to-blue-800 overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute top-10 left-10 w-40 h-40 bg-white/5 rounded-full animate-pulse" />
-        <div className="absolute bottom-10 right-10 w-60 h-60 bg-white/5 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-white/5 rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+        <div
+          className="absolute bottom-10 right-10 w-60 h-60 bg-white/5 rounded-full animate-pulse"
+          style={{ animationDelay: '1s' }}
+        />
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-white/5 rounded-full animate-pulse"
+          style={{ animationDelay: '2s' }}
+        />
       </div>
 
-      <div ref={ref} className={`relative max-w-4xl mx-auto px-4 text-center transition-all duration-700 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+      <div
+        ref={ref}
+        className={`relative max-w-4xl mx-auto px-4 text-center transition-all duration-700 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+      >
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8">
           <Sparkles size={14} className="text-blue-200" />
           <span className="text-sm font-medium text-white">Prêt à passer à l'action ?</span>
@@ -23,13 +32,13 @@ export default function CTASection() {
           Prêt à transformer{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400">
             votre gestion RH
-          </span>
-          {' '}?
+          </span>{' '}
+          ?
         </h2>
 
         <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-          Rejoignez des milliers d'entreprises qui font confiance à EmployéPro Africa.
-          Commencez gratuitement, sans carte bancaire.
+          Rejoignez des milliers d'entreprises qui font confiance à EmployéPro Africa. Commencez
+          gratuitement, sans carte bancaire.
         </p>
 
         <div className="flex flex-wrap justify-center gap-4">

@@ -1,157 +1,220 @@
-import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { AppProvider, useApp } from './context/AppContext';
+import { hasPermission, type Permission } from './utils/permissions';
+import { RegionProvider } from './context/RegionContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { QRCodeProvider } from './context/QRCodeContext';
 import { ToastProvider } from './context/ToastContext';
-import PublicNav from './components/PublicNav';
+import { DataProvider } from './context/DataContext';
 import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
-import { isRoleSufficient } from './utils/permissions';
-import type { UserRole } from './types';
 
-const LandingPage = React.lazy(() => import('./pages/LandingPage'));
-const LoginPage = React.lazy(() => import('./pages/LoginPage'));
-const NotFoundPage = React.lazy(() => import('./pages/NotFoundPage'));
-const RegisterCompanyPage = React.lazy(() => import('./pages/RegisterCompanyPage'));
-const EmployeeInvitationPage = React.lazy(() => import('./pages/EmployeeInvitationPage'));
-const FAQPage = React.lazy(() => import('./pages/FAQPage'));
-const PricingPage = React.lazy(() => import('./pages/PricingPage'));
-const AboutPage = React.lazy(() => import('./pages/AboutPage'));
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const PricingPage = lazy(() => import('./pages/PricingPage'));
+const FAQPage = lazy(() => import('./pages/FAQPage'));
+const DocumentationPage = lazy(() => import('./pages/DocumentationPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterCompanyPage = lazy(() => import('./pages/RegisterCompanyPage'));
+const EmployeeInvitationPage = lazy(() => import('./pages/EmployeeInvitationPage'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const EmployeeDashboard = lazy(() => import('./pages/EmployeeDashboard'));
+const EmployeesPage = lazy(() => import('./pages/EmployeesPage'));
+const SalaryPage = lazy(() => import('./pages/SalaryPage'));
+const AttendancePage = lazy(() => import('./pages/AttendancePage'));
+const EmployeeAttendancePage = lazy(() => import('./pages/EmployeeAttendancePage'));
+const LeavesPage = lazy(() => import('./pages/LeavesPage'));
+const EmployeeLeavesPage = lazy(() => import('./pages/EmployeeLeavesPage'));
+const PayslipsPage = lazy(() => import('./pages/PayslipsPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const AIAssistant = lazy(() => import('./pages/AIAssistant'));
+const MessagesPage = lazy(() => import('./pages/MessagesPage'));
+const DocumentsPage = lazy(() => import('./pages/DocumentsPage'));
+const PerformancePage = lazy(() => import('./pages/PerformancePage'));
+const CalendarPage = lazy(() => import('./pages/CalendarPage'));
+const ReportsPage = lazy(() => import('./pages/ReportsPage'));
+const QRDisplayPage = lazy(() => import('./pages/QRDisplayPage'));
+const QRScanPage = lazy(() => import('./pages/QRScanPage'));
+const AdminQRCodeSettings = lazy(() => import('./pages/AdminQRCodeSettings'));
+const BankingPage = lazy(() => import('./pages/BankingPage'));
+const TrainingPage = lazy(() => import('./pages/TrainingPage'));
+const RecruitmentPage = lazy(() => import('./pages/RecruitmentPage'));
+const MissionsPage = lazy(() => import('./pages/MissionsPage'));
+const TaxPage = lazy(() => import('./pages/TaxPage'));
+const RewardsPage = lazy(() => import('./pages/RewardsPage'));
+const FintechPage = lazy(() => import('./pages/FintechPage'));
+const EmployeeVaultPage = lazy(() => import('./pages/EmployeeVaultPage'));
+const EquipmentPage = lazy(() => import('./pages/EquipmentPage'));
+const WellnessPage = lazy(() => import('./pages/WellnessPage'));
+const ObjectivesPage = lazy(() => import('./pages/ObjectivesPage'));
+const OrgChartPage = lazy(() => import('./pages/OrgChartPage'));
+const TeamsPage = lazy(() => import('./pages/TeamsPage'));
+const MeetingPage = lazy(() => import('./pages/MeetingPage'));
+const ImportPage = lazy(() => import('./pages/ImportPage'));
+const SignaturePage = lazy(() => import('./pages/SignaturePage'));
+const MarketplacePage = lazy(() => import('./pages/MarketplacePage'));
+const FeedPage = lazy(() => import('./pages/FeedPage'));
+const RolesPage = lazy(() => import('./pages/RolesPage'));
+const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
+const LeavePolicyPage = lazy(() => import('./pages/LeavePolicyPage'));
+const OnboardingPage = lazy(() => import('./pages/OnboardingPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
-const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
-const EmployeeDashboard = React.lazy(() => import('./pages/EmployeeDashboard'));
-const EmployeesPage = React.lazy(() => import('./pages/EmployeesPage'));
-const TeamsPage = React.lazy(() => import('./pages/TeamsPage'));
-const FeedPage = React.lazy(() => import('./pages/FeedPage'));
-const ImportPage = React.lazy(() => import('./pages/ImportPage'));
-const SalaryPage = React.lazy(() => import('./pages/SalaryPage'));
-const AttendancePage = React.lazy(() => import('./pages/AttendancePage'));
-const EmployeeAttendancePage = React.lazy(() => import('./pages/EmployeeAttendancePage'));
-const LeavesPage = React.lazy(() => import('./pages/LeavesPage'));
-const EmployeeLeavesPage = React.lazy(() => import('./pages/EmployeeLeavesPage'));
-const PayslipsPage = React.lazy(() => import('./pages/PayslipsPage'));
-const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
-const AIAssistant = React.lazy(() => import('./pages/AIAssistant'));
-const MessagesPage = React.lazy(() => import('./pages/MessagesPage'));
-const DocumentsPage = React.lazy(() => import('./pages/DocumentsPage'));
-const PerformancePage = React.lazy(() => import('./pages/PerformancePage'));
-const CalendarPage = React.lazy(() => import('./pages/CalendarPage'));
-const ReportsPage = React.lazy(() => import('./pages/ReportsPage'));
-const RecruitmentPage = React.lazy(() => import('./pages/RecruitmentPage'));
-const ObjectivesPage = React.lazy(() => import('./pages/ObjectivesPage'));
-const BankingPage = React.lazy(() => import('./pages/BankingPage'));
-const TaxPage = React.lazy(() => import('./pages/TaxPage'));
-const TrainingPage = React.lazy(() => import('./pages/TrainingPage'));
-const MissionsPage = React.lazy(() => import('./pages/MissionsPage'));
-const MarketplacePage = React.lazy(() => import('./pages/MarketplacePage'));
-const OrgChartPage = React.lazy(() => import('./pages/OrgChartPage'));
-const MeetingPage = React.lazy(() => import('./pages/MeetingPage'));
-const EmployeeVaultPage = React.lazy(() => import('./pages/EmployeeVaultPage'));
-const RewardsPage = React.lazy(() => import('./pages/RewardsPage'));
-const EquipmentPage = React.lazy(() => import('./pages/EquipmentPage'));
-const WellnessPage = React.lazy(() => import('./pages/WellnessPage'));
-const FintechPage = React.lazy(() => import('./pages/FintechPage'));
-const SignaturePage = React.lazy(() => import('./pages/SignaturePage'));
+function ProtectedRoute({ children, adminOnly = false, requiredPermission }: { children: React.ReactNode; adminOnly?: boolean; requiredPermission?: Permission }) {
+  const { isLoggedIn, currentUser } = useApp();
+  
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (adminOnly && currentUser?.role !== 'admin') {
+    return <Navigate to="/employee-dashboard" replace />;
+  }
+  
+  if (requiredPermission && !hasPermission(currentUser?.role, requiredPermission)) {
+    return <Navigate to={currentUser?.role === 'admin' ? '/admin' : '/employee-dashboard'} replace />;
+  }
+  
+  return <>{children}</>;
+}
+
+function PageTransition({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 function PageLoader() {
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-        <p className="text-gray-600">Chargement...</p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
     </div>
   );
 }
 
-function ProtectedRoute({ children, adminOnly = false, requiredRole }: { children: React.ReactNode; adminOnly?: boolean; requiredRole?: UserRole }) {
-  const { isLoggedIn, currentUser } = useApp();
-  if (!isLoggedIn) return <Navigate to="/login" replace />;
-  if (adminOnly && currentUser?.role !== 'admin') return <Navigate to="/employee-dashboard" replace />;
-  if (requiredRole && !isRoleSufficient(currentUser?.role, requiredRole)) return <Navigate to="/employee-dashboard" replace />;
-  return <>{children}</>;
-}
-
 function AppRoutes() {
+  const location = useLocation();
   return (
-    <ErrorBoundary>
-      <PublicNav />
+    <AnimatePresence mode="wait">
       <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/faq" element={<FAQPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register-company" element={<RegisterCompanyPage />} />
-          <Route path="/invite/:token" element={<EmployeeInvitationPage />} />
-
-          <Route path="/admin" element={<ProtectedRoute adminOnly><Layout /></ProtectedRoute>}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="employees" element={<EmployeesPage />} />
-            <Route path="teams" element={<TeamsPage />} />
-            <Route path="feed" element={<FeedPage />} />
-            <Route path="import" element={<ImportPage />} />
-            <Route path="salary" element={<SalaryPage />} />
-            <Route path="attendance" element={<AttendancePage />} />
-            <Route path="leaves" element={<LeavesPage />} />
-            <Route path="payslips" element={<PayslipsPage />} />
-            <Route path="performance" element={<PerformancePage />} />
-            <Route path="recruitment" element={<RecruitmentPage />} />
-            <Route path="objectives" element={<ObjectivesPage />} />
-            <Route path="documents" element={<DocumentsPage />} />
-            <Route path="calendar" element={<CalendarPage />} />
-            <Route path="messages" element={<MessagesPage />} />
-            <Route path="reports" element={<ReportsPage />} />
-            <Route path="meetings" element={<MeetingPage />} />
-            <Route path="banking" element={<BankingPage />} />
-            <Route path="tax" element={<TaxPage />} />
-            <Route path="training" element={<TrainingPage />} />
-            <Route path="missions" element={<MissionsPage />} />
-            <Route path="marketplace" element={<MarketplacePage />} />
-            <Route path="org-chart" element={<OrgChartPage />} />
-            <Route path="vault" element={<EmployeeVaultPage />} />
-            <Route path="rewards" element={<RewardsPage />} />
-            <Route path="equipment" element={<EquipmentPage />} />
-            <Route path="wellness" element={<WellnessPage />} />
-            <Route path="fintech" element={<FintechPage />} />
-            <Route path="signatures" element={<SignaturePage />} />
-            <Route path="ai-assistant" element={<AIAssistant />} />
-            <Route path="settings" element={<SettingsPage />} />
-          </Route>
-
-          <Route path="/employee" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-            <Route index element={<EmployeeDashboard />} />
-            <Route path="attendance" element={<EmployeeAttendancePage />} />
-            <Route path="leaves" element={<EmployeeLeavesPage />} />
-            <Route path="payslips" element={<PayslipsPage />} />
-            <Route path="messages" element={<MessagesPage />} />
-            <Route path="calendar" element={<CalendarPage />} />
-            <Route path="vault" element={<EmployeeVaultPage />} />
-            <Route path="rewards" element={<RewardsPage />} />
-            <Route path="equipment" element={<EquipmentPage />} />
-            <Route path="wellness" element={<WellnessPage />} />
-            <Route path="fintech" element={<FintechPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-          </Route>
-
-          <Route path="/" element={<ProtectedRoute adminOnly><><Navigate to="/admin" replace /></></ProtectedRoute>} />
-          <Route path="/employee-dashboard" element={<ProtectedRoute><><Navigate to="/employee" replace /></></ProtectedRoute>} />
-
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+      <Routes location={location} key={location.pathname}>
+        {/* Public routes */}
+        <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
+        <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
+        <Route path="/faq" element={<PageTransition><FAQPage /></PageTransition>} />
+        <Route path="/docs" element={<PageTransition><DocumentationPage /></PageTransition>} />
+        <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
+        <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
+        <Route path="/register-company" element={<PageTransition><RegisterCompanyPage /></PageTransition>} />
+        <Route path="/invite/:token" element={<PageTransition><EmployeeInvitationPage /></PageTransition>} />
+        <Route path="/qr-display" element={<PageTransition><QRDisplayPage /></PageTransition>} />
+        <Route path="/signature" element={<PageTransition><SignaturePage /></PageTransition>} />
+        <Route path="/marketplace" element={<PageTransition><MarketplacePage /></PageTransition>} />
+        
+        {/* QR Scan / Feed (protected) */}
+        <Route path="/scan" element={
+          <ProtectedRoute>
+            <PageTransition><QRScanPage /></PageTransition>
+          </ProtectedRoute>
+        } />
+        <Route path="/feed" element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<PageTransition><FeedPage /></PageTransition>} />
+        </Route>
+        
+        {/* Protected Admin routes */}
+        <Route path="/admin" element={
+          <ProtectedRoute adminOnly>
+            <Layout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<PageTransition><AdminDashboard /></PageTransition>} />
+          <Route path="employees" element={<PageTransition><EmployeesPage /></PageTransition>} />
+          <Route path="salary" element={<PageTransition><SalaryPage /></PageTransition>} />
+          <Route path="attendance" element={<PageTransition><AttendancePage /></PageTransition>} />
+          <Route path="leaves" element={<PageTransition><LeavesPage /></PageTransition>} />
+          <Route path="payslips" element={<PageTransition><PayslipsPage /></PageTransition>} />
+          <Route path="performance" element={<PageTransition><PerformancePage /></PageTransition>} />
+          <Route path="documents" element={<PageTransition><DocumentsPage /></PageTransition>} />
+          <Route path="calendar" element={<PageTransition><CalendarPage /></PageTransition>} />
+          <Route path="messages" element={<PageTransition><MessagesPage /></PageTransition>} />
+          <Route path="reports" element={<PageTransition><ReportsPage /></PageTransition>} />
+          <Route path="ai-assistant" element={<PageTransition><AIAssistant /></PageTransition>} />
+          <Route path="qr-settings" element={<PageTransition><AdminQRCodeSettings /></PageTransition>} />
+          <Route path="banking" element={<PageTransition><BankingPage /></PageTransition>} />
+          <Route path="training" element={<PageTransition><TrainingPage /></PageTransition>} />
+          <Route path="recruitment" element={<PageTransition><RecruitmentPage /></PageTransition>} />
+          <Route path="missions" element={<PageTransition><MissionsPage /></PageTransition>} />
+          <Route path="tax" element={<PageTransition><TaxPage /></PageTransition>} />
+          <Route path="rewards" element={<PageTransition><RewardsPage /></PageTransition>} />
+          <Route path="fintech" element={<PageTransition><FintechPage /></PageTransition>} />
+          <Route path="vault" element={<PageTransition><EmployeeVaultPage /></PageTransition>} />
+          <Route path="equipment" element={<PageTransition><EquipmentPage /></PageTransition>} />
+          <Route path="wellness" element={<PageTransition><WellnessPage /></PageTransition>} />
+          <Route path="objectives" element={<PageTransition><ObjectivesPage /></PageTransition>} />
+          <Route path="org-chart" element={<PageTransition><OrgChartPage /></PageTransition>} />
+          <Route path="teams" element={<PageTransition><TeamsPage /></PageTransition>} />
+          <Route path="meetings" element={<PageTransition><MeetingPage /></PageTransition>} />
+          <Route path="import" element={<PageTransition><ImportPage /></PageTransition>} />
+          <Route path="roles" element={<PageTransition><RolesPage /></PageTransition>} />
+          <Route path="onboarding" element={<PageTransition><OnboardingPage /></PageTransition>} />
+          <Route path="leave-policy" element={<PageTransition><LeavePolicyPage /></PageTransition>} />
+          <Route path="notifications" element={<PageTransition><NotificationsPage /></PageTransition>} />
+          <Route path="settings" element={<PageTransition><SettingsPage /></PageTransition>} />
+        </Route>
+        
+        {/* Protected Employee routes */}
+        <Route path="/employee-dashboard" element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<PageTransition><EmployeeDashboard /></PageTransition>} />
+          <Route path="attendance" element={<PageTransition><EmployeeAttendancePage /></PageTransition>} />
+          <Route path="leaves" element={<PageTransition><EmployeeLeavesPage /></PageTransition>} />
+          <Route path="payslips" element={<PageTransition><PayslipsPage /></PageTransition>} />
+          <Route path="messages" element={<PageTransition><MessagesPage /></PageTransition>} />
+          <Route path="calendar" element={<PageTransition><CalendarPage /></PageTransition>} />
+          <Route path="notifications" element={<PageTransition><NotificationsPage /></PageTransition>} />
+          <Route path="settings" element={<PageTransition><SettingsPage /></PageTransition>} />
+        </Route>
+        
+        <Route path="*" element={<PageTransition><NotFoundPage /></PageTransition>} />
+      </Routes>
       </Suspense>
-    </ErrorBoundary>
+    </AnimatePresence>
   );
 }
 
 export default function App() {
   return (
-    <ToastProvider>
-      <AppProvider>
-        <Router>
-          <AppRoutes />
-        </Router>
-      </AppProvider>
-    </ToastProvider>
+    <AppProvider>
+      <RegionProvider>
+        <ThemeProvider>
+          <DataProvider>
+            <ToastProvider>
+              <Router>
+                <QRCodeProvider>
+                  <ErrorBoundary>
+                    <AppRoutes />
+                  </ErrorBoundary>
+                </QRCodeProvider>
+              </Router>
+            </ToastProvider>
+          </DataProvider>
+        </ThemeProvider>
+      </RegionProvider>
+    </AppProvider>
   );
 }

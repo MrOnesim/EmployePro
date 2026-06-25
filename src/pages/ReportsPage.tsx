@@ -4,7 +4,8 @@ import { useToast } from '../context/ToastContext';
 import { 
   BarChart3, TrendingUp, Users, DollarSign,
   Clock, Calendar, Download, Eye, EyeOff,
-  ChevronDown, ChevronUp, Target, Award, AlertTriangle, ChartLine, Coins
+  ChevronDown, ChevronUp, Target, Award, AlertTriangle,
+  Wallet, UserCheck
 } from 'lucide-react';
 import { 
   BarChart, Bar, Line, XAxis, YAxis, 
@@ -23,7 +24,12 @@ export default function ReportsPage() {
   // Data calculations
   const activeEmployees = employees.filter(e => e.status === 'active');
   const totalSalary = activeEmployees.reduce((sum, e) => sum + e.salary, 0);
-
+  // const _avgSalary = totalSalary / activeEmployees.length || 0;
+  // const _topDepartment = activeEmployees.reduce((acc: Record<string, number>, emp) => {
+  //   acc[emp.department] = (acc[emp.department] || 0) + 1;
+  //   return acc;
+  // }, {});
+  // const _topDept = Object.entries(_topDepartment).sort((a, b) => b[1] - a[1])[0];
 
   // Department salary distribution
   const deptSalaryData = Object.entries(
@@ -113,7 +119,7 @@ export default function ReportsPage() {
   };
 
   const handleExport = () => {
-    addToast('Export du rapport en cours... (PDF/Excel)', 'info');
+    addToast('Export du rapport en cours... (PDF/Excel via backend)', 'info');
   };
 
   return (
@@ -360,7 +366,7 @@ export default function ReportsPage() {
               <YAxis type="category" dataKey="rank" stroke="#9CA3AF" width={80} />
               <Tooltip formatter={(value) => `${((value as number) / 1000).toFixed(0)}K FCFA`} />
               <Bar dataKey="avgSalary" name="Salaire moyen" fill="#2563EB" radius={[0, 4, 4, 0]} />
-              <Bar dataKey="count" name="Effectif" fill="#10B981" radius={[0, 4, 4, 0]} />
+              <Bar dataKey="count" name="Effectif" fill="#10B981" radius={[0, 4, 4, 0]} yAxisId="right" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -374,15 +380,15 @@ export default function ReportsPage() {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white/10 rounded-lg p-4">
-            <h4 className="font-medium mb-2 flex items-center"><Coins size={16} className="mr-2" />Optimisation salariale</h4>
+            <h4 className="font-medium mb-2 flex items-center gap-1.5"><Wallet size={16} /> Optimisation salariale</h4>
             <p className="text-blue-100 text-sm">Le département Informatique représente 35% de la masse salariale. Considérer un audit des compétences pour optimiser le ratio coût/productivité.</p>
           </div>
           <div className="bg-white/10 rounded-lg p-4">
-            <h4 className="font-medium mb-2 flex items-center"><ChartLine size={16} className="mr-2" />Taux de rétention</h4>
+            <h4 className="font-medium mb-2 flex items-center gap-1.5"><UserCheck size={16} /> Taux de rétention</h4>
             <p className="text-blue-100 text-sm">Le taux de rétention est excellent à 92%. Les départements Marketing et Ventes nécessitent une attention particulière (88.3% de présence).</p>
           </div>
           <div className="bg-white/10 rounded-lg p-4">
-            <h4 className="font-medium mb-2 flex items-center"><Target size={16} className="mr-2" />Formation</h4>
+            <h4 className="font-medium mb-2 flex items-center gap-1.5"><Target size={16} /> Formation</h4>
             <p className="text-blue-100 text-sm">Recommandation : former 3 employés aux compétences digitales pour maintenir la compétitivité. Budget estimé : 500K FCFA.</p>
           </div>
         </div>

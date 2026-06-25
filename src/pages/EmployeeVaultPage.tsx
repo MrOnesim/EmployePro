@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import { FileText, GraduationCap, IdCard, DollarSign, Award, ClipboardList, Plus, Trash2, Upload } from 'lucide-react';
 import type { EmployeeVaultItem } from '../types';
@@ -48,7 +49,8 @@ const statusLabels: Record<string, string> = {
 };
 
 export default function EmployeeVaultPage() {
-  const { vaultItems, addVaultItem, deleteVaultItem, currentUser } = useApp();
+  const { currentUser } = useApp();
+  const { vaultItems, addVaultItem, deleteVaultItem } = useData();
   const { addToast } = useToast();
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [showModal, setShowModal] = useState(false);

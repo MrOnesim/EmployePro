@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { Building2, Users, Search, ChevronDown, ChevronRight, Star, Crown, Mail, Phone } from 'lucide-react';
 import type { Employee } from '../types';
 import Avatar from '../components/Avatar';
@@ -12,7 +12,7 @@ function getDepartmentIcon() {
 }
 
 export default function OrgChartPage() {
-  const { employees } = useApp();
+  const { employees } = useData();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedDepts, setExpandedDepts] = useState<Set<string>>(new Set());
   const [popoverEmployee, setPopoverEmployee] = useState<Employee | null>(null);

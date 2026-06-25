@@ -1,49 +1,76 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Play, Globe, Users, Shield, Star } from 'lucide-react';
+import { useCountUp } from '../../hooks/useCountUp';
 
 const stats = [
-  { value: '50 000+', label: 'Employés gérés', icon: Users },
-  { value: '16+', label: 'Pays supportés', icon: Globe },
-  { value: '99.9%', label: 'Disponibilité', icon: Shield },
-  { value: '4.9/5', label: 'Satisfaction', icon: Star },
+  { value: 50, label: 'Employés gérés', icon: Users, suffix: 'K+' },
+  { value: 16, label: 'Pays supportés', icon: Globe, suffix: '+' },
+  { value: 99, label: 'Disponibilité', icon: Shield, suffix: '.9%' },
+  { value: 49, label: 'Satisfaction', icon: Star, suffix: '/5', prefix: '4.' },
 ];
+
+function StatCard({ stat }: { stat: (typeof stats)[0] }) {
+  const { count, ref } = useCountUp(stat.value, 2500);
+  return (
+    <div
+      ref={ref}
+      className="bg-white/10 backdrop-blur-sm rounded-xl px-3 py-4 md:px-4 md:py-5 border border-white/10 hover:bg-white/15 transition-all hover:-translate-y-0.5 text-center"
+    >
+      <div className="text-2xl md:text-3xl font-black text-white tracking-tight leading-none mb-1.5">
+        {stat.prefix ?? ''}
+        {count}
+        {stat.suffix}
+      </div>
+      <div className="flex items-center justify-center gap-1.5">
+        <stat.icon size={13} className="text-blue-300 shrink-0" />
+        <span className="text-xs md:text-sm font-medium text-white/80 leading-tight">
+          {stat.label}
+        </span>
+      </div>
+    </div>
+  );
+}
 
 export default function HeroSection() {
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
     const handle = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handle);
+    window.addEventListener('scroll', handle, { passive: true });
     return () => window.removeEventListener('scroll', handle);
   }, []);
 
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center bg-cover bg-center overflow-hidden pb-12 md:pb-20"
-      style={{ backgroundImage: "url('/images/bg-hero.jpg')" }}
+      className="relative min-h-screen flex items-center overflow-hidden pb-12 md:pb-20"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 via-blue-700/85 to-indigo-800/90" />
-      {/* Decorative circles */}
-      <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
+      {/* Animated grid background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900" />
       <div
-        className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"
-        style={{ animationDelay: '1s' }}
-      />
-      <div
-        className="absolute top-1/3 left-1/3 w-64 h-64 bg-green-500/10 rounded-full blur-3xl animate-pulse"
-        style={{ animationDelay: '2s' }}
+        className="absolute inset-0 opacity-20"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M40 0L0 40M0 0l40 40' stroke='white' stroke-width='0.5'/%3E%3C/svg%3E")`,
+          backgroundSize: '40px 40px',
+          transform: `translateY(${scrollY * -0.3}px)`,
+        }}
       />
 
-      {/* Geometric shapes */}
+      {/* Decorative blobs */}
+      <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl" />
       <div
-        className="absolute top-32 left-[20%] w-16 h-16 border border-white/20 rounded-xl rotate-45 animate-pulse"
-        style={{ animationDuration: '6s' }}
+        className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"
       />
       <div
-        className="absolute bottom-48 right-[15%] w-12 h-12 border border-white/20 rounded-full animate-pulse"
-        style={{ animationDuration: '5s', animationDelay: '1s' }}
+        className="absolute top-1/3 left-1/2 w-64 h-64 bg-cyan-400/10 rounded-full blur-3xl"
+      />
+
+      {/* Bottom transition gradient */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-gray-50 z-10" />
+      <div
+        className="absolute -bottom-1 left-0 right-0 h-16 bg-gray-50 z-10"
+        style={{ clipPath: 'ellipse(80% 100% at 50% 100%)' }}
       />
 
       <div
@@ -53,20 +80,17 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left column */}
           <div className="pt-20 lg:pt-0">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8">
-              <Globe size={14} className="text-blue-200" />
-              <span className="text-sm font-medium text-white">Conçu pour l'Afrique</span>
-            </div>
-
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-6 tracking-tight">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl mt-8 font-black text-white leading-[1.05] mb-6 tracking-tight">
               Gérez vos{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-orange-300 to-pink-400">
                 RH
               </span>{' '}
-              sans limites
+              <span className="bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                sans limites
+              </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-blue-100 leading-relaxed mb-10 max-w-lg">
+            <p className="text-lg md:text-xl text-blue-100/90 leading-relaxed mb-10 max-w-lg">
               La plateforme RH et paie tout-en-un pour les entreprises ambitieuses. Paie multi-pays,
               IA embarquée, signatures électroniques.
             </p>
@@ -74,40 +98,27 @@ export default function HeroSection() {
             <div className="flex flex-wrap gap-4 mb-16">
               <Link
                 to="/register-company"
-                className="group inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl"
+                className="group inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 active:scale-95 transition-all shadow-lg hover:shadow-xl"
               >
                 Essai gratuit
                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </Link>
-              <button className="inline-flex items-center gap-2 bg-white/10 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/20 transition-all border border-white/20">
+              <button className="inline-flex items-center gap-2 bg-white/10 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/20 active:scale-95 transition-all border border-white/20 backdrop-blur-sm">
                 <Play size={20} />
                 Voir la démo
               </button>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
               {stats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:bg-white/15 transition-all"
-                >
-                  <div className="text-3xl md:text-4xl font-black text-white tracking-tight leading-none mb-2">
-                    {stat.value}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <stat.icon size={14} className="text-blue-300" />
-                    <span className="text-xs md:text-sm font-medium text-white/80">
-                      {stat.label}
-                    </span>
-                  </div>
-                </div>
+                <StatCard key={stat.label} stat={stat} />
               ))}
             </div>
           </div>
 
-          {/* Right column */}
+          {/* Right column — floating mockup */}
           <div className="hidden lg:block relative">
-            <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-8 shadow-2xl">
+            <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-8 shadow-2xl animate-float">
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-3 h-3 rounded-full bg-red-400" />
                 <div className="w-3 h-3 rounded-full bg-yellow-400" />
@@ -123,10 +134,10 @@ export default function HeroSection() {
                     />
                   ))}
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid mb-10 grid-cols-3 gap-3 text-center">
                   {[
                     { label: 'Employés', value: '1 247', change: '+12%' },
-                    { label: 'Paie traitée', value: '485K FCFA', change: '+8%' },
+                    { label: 'Paie traitée', value: '485K €', change: '+8%' },
                     { label: 'Présences', value: '95.2%', change: '+3%' },
                   ].map((item) => (
                     <div
@@ -141,13 +152,25 @@ export default function HeroSection() {
                 </div>
               </div>
             </div>
-            <div className="absolute -bottom-4 -right-4 bg-white rounded-2xl p-5 shadow-xl animate-float">
+            <div
+              className="absolute -bottom-4 -right-4 bg-white rounded-2xl p-5 shadow-xl"
+              style={{ animationDelay: '-1s' }}
+            >
               <div className="flex items-center gap-3">
                 <Shield size={24} className="text-blue-600" />
                 <div>
                   <div className="text-gray-900 font-bold">Sécurisé</div>
                   <div className="text-gray-500 text-xs">Données chiffrées</div>
                 </div>
+              </div>
+            </div>
+            <div
+              className="absolute -top-4 -left-4 bg-gradient-to-r from-yellow-200 via-orange-200 to-pink-400 rounded-2xl p-3 shadow-xl"
+              style={{ animationDelay: '-2s' }}
+            >
+              <div className="flex items-center gap-2">
+                <Star size={16} className="text-white fill-white" />
+                <span className="text-white font-bold text-sm">4.9/5</span>
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import { Briefcase, MapPin, Star, Plus, Edit2, Trash2, Search, Filter, Eye, Users, Clock } from 'lucide-react';
 import type { JobPost } from '../types';
@@ -30,7 +31,8 @@ const JOB_CATEGORIES = [
 ];
 
 export default function MarketplacePage() {
-  const { jobPosts, currentCompany, addJobPost, updateJobPost, deleteJobPost } = useApp();
+  const { currentCompany } = useApp();
+  const { jobPosts, addJobPost, updateJobPost, deleteJobPost } = useData();
   const { addToast } = useToast();
   const [tab, setTab] = useState<'published' | 'market'>('published');
   const [search, setSearch] = useState('');

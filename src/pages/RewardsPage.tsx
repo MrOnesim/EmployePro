@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import { Gift, Trophy, Star, Coins, ShoppingBag, Plus, X } from 'lucide-react';
 import Badge from '../components/Badge';
@@ -19,7 +20,8 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export default function RewardsPage() {
-  const { rewardTransactions, rewardCatalog, addRewardTransaction, redeemReward, currentUser, employees, addNotification } = useApp();
+  const { currentUser, addNotification } = useApp();
+  const { rewardTransactions, rewardCatalog, addRewardTransaction, redeemReward, employees } = useData();
   const { addToast } = useToast();
   const [tab, setTab] = useState<'history' | 'catalog'>('history');
   const [showAwardModal, setShowAwardModal] = useState(false);

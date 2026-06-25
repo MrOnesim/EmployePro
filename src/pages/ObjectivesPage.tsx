@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import {
   Target, Star, Plus, Edit2, Trash2, Calendar, CheckCircle, XCircle, Clock, User as UserIcon
@@ -56,7 +57,8 @@ function StarRating({ value, onChange }: { value: number; onChange?: (v: number)
 }
 
 export default function ObjectivesPage() {
-  const { employees, currentUser, objectives, performanceReviews, addObjective, updateObjective, deleteObjective, addPerformanceReview } = useApp();
+  const { currentUser } = useApp();
+  const { employees, objectives, performanceReviews, addObjective, updateObjective, deleteObjective, addPerformanceReview } = useData();
   const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState<'objectives' | 'reviews'>('objectives');
 

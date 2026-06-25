@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import {
   Monitor, Smartphone, Car, CreditCard, Wrench, Plus, Search,
@@ -66,7 +67,8 @@ const DEFAULT_FORM: Omit<Equipment, 'id'> = {
 };
 
 export default function EquipmentPage() {
-  const { equipment, equipmentAssignments, addEquipment, assignEquipment, returnEquipment, employees, currentUser } = useApp();
+  const { currentUser } = useApp();
+  const { equipment, equipmentAssignments, addEquipment, assignEquipment, returnEquipment, employees } = useData();
   const { addToast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');

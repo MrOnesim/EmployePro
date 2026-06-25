@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import {
   Landmark, Wallet, ArrowUpRight, ArrowDownLeft,
@@ -36,11 +37,12 @@ const TRANSFER_TYPES: Record<string, { label: string }> = {
 };
 
 export default function FintechPage() {
+  const { currentUser } = useApp();
   const {
     salaryAdvances, salaryTransfers, requestSalaryAdvance,
     approveSalaryAdvance, paySalaryAdvance, rejectSalaryAdvance,
-    employees, currentUser,
-  } = useApp();
+    employees,
+  } = useData();
   const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState<'advances' | 'transfers'>('advances');
   const [showRequestModal, setShowRequestModal] = useState(false);

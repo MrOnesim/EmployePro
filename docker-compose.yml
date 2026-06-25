@@ -15,7 +15,7 @@ services:
       - ./server:/app
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://employepro:changeme@db:5432/employepro
+      DATABASE_URL: ${DATABASE_URL:-postgresql://employepro:changeme@db:5432/employepro}
       REDIS_URL: redis://redis:6379
     depends_on:
       db:
@@ -27,9 +27,9 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: employepro
-      POSTGRES_PASSWORD: changeme
-      POSTGRES_DB: employepro
+      POSTGRES_USER: ${DB_USER:-employepro}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_DB: ${DB_NAME:-employepro}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

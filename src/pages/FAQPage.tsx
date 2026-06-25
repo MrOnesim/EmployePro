@@ -1,5 +1,6 @@
 import { useState, type ElementType } from 'react';
 import { ChevronDown, Globe, Users, DollarSign, Calendar, Bot, Shield, Headphones, BookOpen, Mail, Phone, Search } from 'lucide-react';
+import PublicNav from '../components/PublicNav';
 import FooterSection from '../components/landing/FooterSection';
 
 interface FAQItem {
@@ -98,9 +99,10 @@ export default function FAQPage() {
   const totalQuestions = faqData.reduce((sum, cat) => sum + cat.items.length, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pt-16">
+      <PublicNav />
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 py-20 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 py-20 overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-40 h-40 bg-white/5 rounded-full animate-pulse" />
           <div className="absolute bottom-10 right-10 w-60 h-60 bg-white/5 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
@@ -223,14 +225,14 @@ export default function FAQPage() {
         )}
 
         {/* Contact Section */}
-        <div className="mt-16 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white text-center">
+        <div className="mt-16 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 text-white text-center">
           <h3 className="text-2xl font-bold mb-3">Vous n'avez pas trouvé votre réponse ?</h3>
           <p className="text-blue-100 mb-6">Notre équipe est disponible 24/7 pour vous aider.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <a href="mailto:support@employepro.com" className="inline-flex items-center bg-white text-blue-600 px-6 py-3 rounded-xl font-medium hover:bg-blue-50 transition-colors">
+            <a href="mailto:support@employepro.com" className="inline-flex items-center bg-white text-blue-600 px-6 py-3 rounded-xl font-medium hover:bg-blue-50 active:scale-95 transition-all">
               <Mail size={18} className="mr-2" /> support@employepro.com
             </a>
-            <a href="tel:+33123456789" className="inline-flex items-center bg-white/10 text-white px-6 py-3 rounded-xl font-medium hover:bg-white/20 transition-colors border border-white/20">
+            <a href="tel:+33123456789" className="inline-flex items-center bg-white/10 text-white px-6 py-3 rounded-xl font-medium hover:bg-white/20 active:scale-95 transition-all border border-white/20">
               <Phone size={18} className="mr-2" /> +33 1 23 45 67 89
             </a>
           </div>

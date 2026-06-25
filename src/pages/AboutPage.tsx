@@ -1,5 +1,8 @@
 import { Users, Shield, Clock, Heart, Target, ArrowRight, MapPin, CheckCircle, CreditCard, Building2, BookOpen, HeadphonesIcon, BarChart3, Briefcase, DollarSign, FileText, MessageSquare, Gift, Monitor, Zap } from 'lucide-react';
+import PublicNav from '../components/PublicNav';
 import FooterSection from '../components/landing/FooterSection';
+import CountUp from '../components/ui/CountUp';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 
 const team = [
   { name: 'Amadou Diallo', role: 'CEO & Co-fondateur', bio: 'Ex-directeur RH chez Orange, expert en transformation RH', location: 'Sénégal' },
@@ -82,11 +85,78 @@ const partners = [
   { name: 'Slack', logo: 'Slack', desc: 'Notifications RH' },
 ];
 
+function StorySection() {
+  const { ref, isVisible } = useScrollReveal();
+  return (
+    <section ref={ref} className={`max-w-4xl mx-auto px-4 py-24 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <div className="text-center mb-16">
+        <h2 className="text-3xl font-black text-gray-800 mb-4">Notre histoire</h2>
+        <p className="text-gray-500 text-lg max-w-3xl mx-auto">
+          EmployéPro a été fondée en 2020 par Amadou Diallo et Marie Dubois, réunissant 
+          une expertise RH de terrain et une maîtrise technologique de pointe.
+        </p>
+      </div>
+      <div className="space-y-8 text-gray-600 leading-relaxed text-lg">
+        <p>
+          <strong className="text-gray-800">Le constat :</strong> Les solutions RH disponibles sur le marché 
+          sont soit trop chères pour les PME, soit conçues uniquement pour les pays développés, 
+          ignorant les spécificités africaines : mobile money, régimes sociaux variés, 
+          absence de couverture Internet permanente.
+        </p>
+        <p>
+          <strong className="text-gray-800">La solution :</strong> Une plateforme SaaS complète, accessible partout, 
+          fonctionnant hors ligne, compatible avec les moyens de paiement locaux 
+          et conforme aux législations de 60+ pays. Le tout propulsé par une intelligence 
+          artificielle qui automatise les tâches répétitives et fournit des analyses prédictives.
+        </p>
+        <p>
+          <strong className="text-gray-800">Aujourd'hui :</strong> Plus de 10 000 entreprises nous font confiance 
+          à travers le monde. Nous traitons plus de 50 millions de salaires chaque mois 
+          et notre équipe de 120+ collaborateurs répartis sur 4 continents continue d'innover 
+          pour rendre les RH accessibles à toutes les entreprises.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function ModuleCard({ module, index }: { module: (typeof modules)[0]; index: number }) {
+  const { ref, isVisible } = useScrollReveal();
+  return (
+    <div ref={ref} className={`bg-gray-50 rounded-xl p-5 border border-gray-100 hover:shadow-md hover:ring-2 hover:ring-blue-200/50 transition-all duration-500 group ${
+      isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+    }`} style={{ transitionDelay: `${index * 60}ms` }}>
+      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+        <module.icon size={24} className="text-white" />
+      </div>
+      <h3 className="font-bold text-gray-800 mb-1">{module.title}</h3>
+      <p className="text-gray-500 text-sm">{module.desc}</p>
+    </div>
+  );
+}
+
+function StepCard({ step, index }: { step: (typeof steps)[0]; index: number }) {
+  const { ref, isVisible } = useScrollReveal();
+  return (
+    <div ref={ref} className={`bg-white rounded-xl p-6 border border-gray-100 hover:shadow-lg transition-all duration-500 relative ${
+      isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+    }`} style={{ transitionDelay: `${index * 100}ms` }}>
+      <div className="absolute -top-3 -left-3 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+        {step.step}
+      </div>
+      <h3 className="text-xl font-bold text-gray-800 mb-2 mt-2">{step.title}</h3>
+      <p className="text-gray-500 mb-3">{step.desc}</p>
+      <p className="text-gray-400 text-sm">{step.detail}</p>
+    </div>
+  );
+}
+
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-16">
+      <PublicNav />
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 py-24 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 py-24 overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-40 h-40 bg-white/5 rounded-full animate-pulse" />
           <div className="absolute bottom-10 right-10 w-60 h-60 bg-white/5 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
@@ -111,13 +181,15 @@ export default function AboutPage() {
       <section className="max-w-6xl mx-auto px-4 -mt-12 relative z-10">
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
-            { value: '2020', label: 'Année de création' },
-            { value: '60+', label: 'Pays supportés' },
-            { value: '10K+', label: 'Entreprises clientes' },
-            { value: '50M+', label: 'Salaires traités/mois' },
+            { value: 2020, suffix: '', label: 'Année de création' },
+            { value: 60, suffix: '+', label: 'Pays supportés' },
+            { value: 10000, suffix: '+', label: 'Entreprises clientes' },
+            { value: 50000000, suffix: '+', label: 'Salaires traités/mois' },
           ].map((stat, i) => (
             <div key={i} className="text-center">
-              <div className="text-3xl font-black text-blue-600 mb-1">{stat.value}</div>
+              <div className="text-3xl font-black text-blue-600 mb-1">
+                <CountUp end={stat.value} suffix={stat.suffix} />
+              </div>
               <p className="text-gray-500 text-sm">{stat.label}</p>
             </div>
           ))}
@@ -125,35 +197,7 @@ export default function AboutPage() {
       </section>
 
       {/* Story */}
-      <section className="max-w-4xl mx-auto px-4 py-24">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-black text-gray-800 mb-4">Notre histoire</h2>
-          <p className="text-gray-500 text-lg max-w-3xl mx-auto">
-            EmployéPro a été fondée en 2020 par Amadou Diallo et Marie Dubois, réunissant 
-            une expertise RH de terrain et une maîtrise technologique de pointe.
-          </p>
-        </div>
-        <div className="space-y-8 text-gray-600 leading-relaxed text-lg">
-          <p>
-            <strong className="text-gray-800">Le constat :</strong> Les solutions RH disponibles sur le marché 
-            sont soit trop chères pour les PME, soit conçues uniquement pour les pays développés, 
-            ignorant les spécificités africaines : mobile money, régimes sociaux variés, 
-            absence de couverture Internet permanente.
-          </p>
-          <p>
-            <strong className="text-gray-800">La solution :</strong> Une plateforme SaaS complète, accessible partout, 
-            fonctionnant hors ligne, compatible avec les moyens de paiement locaux 
-            et conforme aux législations de 60+ pays. Le tout propulsé par une intelligence 
-            artificielle qui automatise les tâches répétitives et fournit des analyses prédictives.
-          </p>
-          <p>
-            <strong className="text-gray-800">Aujourd'hui :</strong> Plus de 10 000 entreprises nous font confiance 
-            à travers le monde. Nous traitons plus de 50 millions de salaires chaque mois 
-            et notre équipe de 120+ collaborateurs répartis sur 4 continents continue d'innover 
-            pour rendre les RH accessibles à toutes les entreprises.
-          </p>
-        </div>
-      </section>
+      <StorySection />
 
       {/* How it works */}
       <section className="bg-gray-50 py-24">
@@ -165,39 +209,26 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {steps.map((s) => (
-              <div key={s.step} className="bg-white rounded-xl p-6 border border-gray-100 hover:shadow-lg transition-all relative">
-                <div className="absolute -top-3 -left-3 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                  {s.step}
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2 mt-2">{s.title}</h3>
-                <p className="text-gray-500 mb-3">{s.desc}</p>
-                <p className="text-gray-400 text-sm">{s.detail}</p>
-              </div>
+            {steps.map((s, i) => (
+              <StepCard key={s.step} step={s} index={i} />
             ))}
           </div>
         </div>
       </section>
 
       {/* Features */}
-      <section className="max-w-6xl mx-auto px-4 py-24">
+      <section className="max-w-6xl mx-auto px-4 py-24 bg-dot-pattern">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-black text-gray-800 mb-4">Modules disponibles</h2>
           <p className="text-gray-500 text-lg max-w-2xl mx-auto">
             Une solution complète pour tous vos processus RH, de l'embauche à la paie
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {modules.map((m, i) => (
-            <div key={i} className="bg-gray-50 rounded-xl p-5 border border-gray-100 hover:shadow-md transition-all group">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                <m.icon size={24} className="text-white" />
-              </div>
-              <h3 className="font-bold text-gray-800 mb-1">{m.title}</h3>
-              <p className="text-gray-500 text-sm">{m.desc}</p>
-            </div>
-          ))}
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {modules.map((m, i) => (
+              <ModuleCard key={m.title} module={m} index={i} />
+            ))}
+          </div>
       </section>
 
       {/* Payment Methods */}
@@ -329,8 +360,8 @@ export default function AboutPage() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
           {partners.map((p, i) => (
-            <div key={i} className="bg-gray-50 rounded-xl p-6 border border-gray-100 text-center hover:shadow-md transition-all">
-              <div className="w-12 h-12 bg-white rounded-xl border border-gray-200 flex items-center justify-center mx-auto mb-3">
+            <div key={i} className="bg-gray-50 rounded-xl p-6 border border-gray-100 text-center hover:shadow-md hover:ring-2 hover:ring-blue-200/50 transition-all group">
+              <div className="w-12 h-12 bg-white rounded-xl border border-gray-200 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                 <Building2 size={24} className="text-gray-600" />
               </div>
               <p className="font-bold text-gray-800 text-sm">{p.name}</p>
@@ -369,7 +400,7 @@ export default function AboutPage() {
         <p className="text-gray-500 text-lg mb-8 max-w-2xl mx-auto">
           Plus de 10 000 entreprises utilisent déjà EmployéPro. Essayez gratuitement pendant 14 jours, sans carte bancaire.
         </p>
-        <a href="/register-company" className="inline-flex items-center bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg group">
+        <a href="/register-company" className="inline-flex items-center bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 active:scale-95 transition-all shadow-lg group">
           Essayer gratuitement
           <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
         </a>

@@ -1,23 +1,32 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { useTheme } from '../context/ThemeContext';
 import { canAccessMenu } from '../utils/permissions';
 import { 
   Home, Users, DollarSign, Clock, Calendar, FileText, 
   Settings, LogOut, Bell, Menu, X, MessageSquare, User,
-  TrendingUp, PartyPopper, File, Bot, BarChart3, UsersRound, Rss, Upload,
-  Sun, Moon, Briefcase, Target, Landmark, BookOpen, Plane,
-  Store, GitBranch, Video, Shield, Gift, Monitor, Heart, Wallet,
-  FileSignature,
+  TrendingUp, PartyPopper, File, Bot, BarChart3, Sun, Moon,
+  QrCode, Landmark, GraduationCap, UserPlus, Briefcase, Receipt,
+  Award, PiggyBank, Shield, Monitor, Heart, Target, GitBranch,
+  Video, Upload, Rss, CheckCircle2
 } from 'lucide-react';
 import { useState } from 'react';
-import { useTheme } from '../context/ThemeContext';
-import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from './LanguageSwitcher';
+
+function DarkModeToggle() {
+  const { theme, toggleTheme } = useTheme();
+  return (
+    <button
+      onClick={toggleTheme}
+      className="flex items-center w-full px-4 py-2.5 rounded-lg text-blue-100 hover:bg-white/10 hover:text-white transition-all group"
+    >
+      {theme === 'dark' ? <Sun size={18} className="mr-3" /> : <Moon size={18} className="mr-3" />}
+      <span className="font-medium text-sm">{theme === 'dark' ? 'Mode clair' : 'Mode sombre'}</span>
+    </button>
+  );
+}
 
 export default function Layout() {
-  const { t } = useTranslation();
   const { currentUser, currentCompany, logout, notifications, markNotificationRead } = useApp();
-  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -27,56 +36,56 @@ export default function Layout() {
   
   const adminMenuItems = [
     { path: '/admin', icon: Home, label: 'Tableau de bord' },
+    { path: '/admin/onboarding', icon: CheckCircle2, label: 'Onboarding' },
+    { path: '/admin/messages', icon: MessageSquare, label: 'Messages' },
+    { path: '/admin/notifications', icon: Bell, label: 'Notifications' },
+    { path: '/feed', icon: Rss, label: 'Fil d\'actualité' },
     { path: '/admin/employees', icon: Users, label: 'Employés' },
-    { path: '/admin/teams', icon: UsersRound, label: 'Équipes' },
-    { path: '/admin/feed', icon: Rss, label: 'Fil d\'actualité' },
-    { path: '/admin/import', icon: Upload, label: 'Import CSV' },
-    { path: '/admin/salary', icon: DollarSign, label: 'Salaires' },
+    { path: '/admin/org-chart', icon: GitBranch, label: 'Organigramme' },
+    { path: '/admin/teams', icon: Users, label: 'Équipes' },
     { path: '/admin/attendance', icon: Clock, label: 'Présences' },
     { path: '/admin/leaves', icon: Calendar, label: 'Congés' },
+    { path: '/admin/leave-policy', icon: Calendar, label: 'Politique congés' },
     { path: '/admin/payslips', icon: FileText, label: 'Bulletins de paie' },
+    { path: '/admin/salary', icon: DollarSign, label: 'Salaires' },
     { path: '/admin/performance', icon: TrendingUp, label: 'Performance' },
-    { path: '/admin/recruitment', icon: Briefcase, label: 'Recrutement' },
     { path: '/admin/objectives', icon: Target, label: 'Objectifs' },
-    { path: '/admin/documents', icon: File, label: 'Documents' },
-    { path: '/admin/calendar', icon: PartyPopper, label: 'Calendrier' },
-    { path: '/admin/messages', icon: MessageSquare, label: 'Messages' },
-    { path: '/admin/reports', icon: BarChart3, label: 'Rapports' },
-    { path: '/admin/meetings', icon: Video, label: 'Réunions' },
+    { path: '/admin/recruitment', icon: UserPlus, label: 'Recrutement' },
+    { path: '/admin/training', icon: GraduationCap, label: 'Formations' },
+    { path: '/admin/missions', icon: Briefcase, label: 'Missions & Notes' },
     { path: '/admin/banking', icon: Landmark, label: 'Banque' },
-    { path: '/admin/tax', icon: FileText, label: 'Fiscalité' },
-    { path: '/admin/training', icon: BookOpen, label: 'Formation' },
-    { path: '/admin/missions', icon: Plane, label: 'Missions' },
-    { path: '/admin/marketplace', icon: Store, label: 'Marketplace' },
-    { path: '/admin/org-chart', icon: GitBranch, label: 'Organigramme' },
+    { path: '/admin/tax', icon: Receipt, label: 'Déclarations fiscales' },
+    { path: '/admin/fintech', icon: PiggyBank, label: 'Banque salariale' },
+    { path: '/admin/rewards', icon: Award, label: 'Récompenses' },
+    { path: '/admin/equipment', icon: Monitor, label: 'Équipements' },
     { path: '/admin/vault', icon: Shield, label: 'Coffre-fort' },
-    { path: '/admin/rewards', icon: Gift, label: 'Récompenses' },
-    { path: '/admin/equipment', icon: Monitor, label: 'Matériel' },
     { path: '/admin/wellness', icon: Heart, label: 'Bien-être' },
-    { path: '/admin/fintech', icon: Wallet, label: 'Banque Fintech' },
-    { path: '/admin/signatures', icon: FileSignature, label: 'Signature' },
+    { path: '/admin/meetings', icon: Video, label: 'Réunions' },
+    { path: '/admin/documents', icon: File, label: 'Documents' },
+    { path: '/admin/import', icon: Upload, label: 'Import' },
+    { path: '/admin/calendar', icon: PartyPopper, label: 'Calendrier' },
+    { path: '/admin/reports', icon: BarChart3, label: 'Rapports' },
     { path: '/admin/ai-assistant', icon: Bot, label: 'Assistant IA' },
+    { path: '/admin/qr-settings', icon: QrCode, label: 'Pointage QR' },
+    { path: '/admin/roles', icon: Shield, label: 'Rôles & Permissions' },
     { path: '/admin/settings', icon: Settings, label: 'Paramètres' },
   ];
   
   const employeeMenuItems = [
-    { path: '/employee', icon: Home, label: 'Tableau de bord' },
-    { path: '/employee/attendance', icon: Clock, label: 'Pointage' },
-    { path: '/employee/leaves', icon: Calendar, label: 'Congés' },
-    { path: '/employee/payslips', icon: FileText, label: 'Bulletins de paie' },
-    { path: '/employee/vault', icon: Shield, label: 'Coffre-fort' },
-    { path: '/employee/rewards', icon: Gift, label: 'Récompenses' },
-    { path: '/employee/equipment', icon: Monitor, label: 'Mon matériel' },
-    { path: '/employee/wellness', icon: Heart, label: 'Bien-être' },
-    { path: '/employee/fintech', icon: Wallet, label: 'Banque Fintech' },
-    { path: '/employee/messages', icon: MessageSquare, label: 'Messages' },
-    { path: '/employee/calendar', icon: PartyPopper, label: 'Calendrier' },
-    { path: '/employee/settings', icon: Settings, label: 'Paramètres' },
+    { path: '/employee-dashboard', icon: Home, label: 'Tableau de bord' },
+    { path: '/feed', icon: Rss, label: 'Fil d\'actualité' },
+    { path: '/employee-dashboard/attendance', icon: Clock, label: 'Pointage' },
+    { path: '/employee-dashboard/leaves', icon: Calendar, label: 'Congés' },
+    { path: '/employee-dashboard/payslips', icon: FileText, label: 'Bulletins de paie' },
+    { path: '/employee-dashboard/messages', icon: MessageSquare, label: 'Messages' },
+    { path: '/employee-dashboard/notifications', icon: Bell, label: 'Notifications' },
+    { path: '/employee-dashboard/calendar', icon: PartyPopper, label: 'Calendrier' },
+    { path: '/employee-dashboard/settings', icon: Settings, label: 'Paramètres' },
   ];
   
-  const menuItems = (isAdmin ? adminMenuItems : employeeMenuItems).filter(
-    item => canAccessMenu(currentUser?.role, item.path)
-  );
+  const menuItems = (isAdmin ? adminMenuItems : employeeMenuItems).filter(item => {
+    return canAccessMenu(currentUser?.role, item.path);
+  });
   const unreadNotifications = notifications.filter(n => !n.read && n.userId === currentUser?.id);
 
   const handleLogout = () => {
@@ -97,12 +106,15 @@ export default function Layout() {
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-4 bg-blue-800/50">
             <Link to="/" className="flex items-center space-x-2">
-              <img src="/images/logo.png" alt="EmployéPro" className="w-10 h-10 rounded-xl object-cover" />
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
+                <span className="text-blue-600 font-bold text-lg">EP</span>
+              </div>
               <span className="text-white font-semibold text-lg hidden sm:block">EmployéPro</span>
             </Link>
             <button 
               onClick={() => setSidebarOpen(false)}
               className="text-white lg:hidden"
+              aria-label="Fermer le menu"
             >
               <X size={24} />
             </button>
@@ -126,7 +138,8 @@ export default function Layout() {
           {/* Navigation */}
           <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
             {menuItems.map((item) => {
-              const isActive = location.pathname === item.path;
+              const isActive = location.pathname === item.path || 
+                (item.path !== '/' && item.path !== '/admin' && location.pathname.startsWith(item.path + '/'));
               return (
                 <Link
                   key={item.path}
@@ -146,6 +159,11 @@ export default function Layout() {
             })}
           </nav>
 
+          {/* Dark Mode Toggle */}
+          <div className="p-2 border-t border-blue-500/50">
+            <DarkModeToggle />
+          </div>
+
           {/* User Profile */}
           <div className="p-4 border-t border-blue-500/50">
             <div className="flex items-center space-x-3">
@@ -158,13 +176,13 @@ export default function Layout() {
                 </p>
                 <p className="text-blue-200 text-xs truncate">{currentUser?.position}</p>
               </div>
-              <button 
-                onClick={handleLogout}
-                className="text-blue-200 hover:text-white transition-colors"
-                title="Déconnexion"
-              >
-                <LogOut size={20} />
-              </button>
+          <button 
+            onClick={handleLogout}
+            className="text-blue-200 hover:text-white transition-colors"
+            aria-label="Déconnexion"
+          >
+            <LogOut size={20} />
+          </button>
             </div>
           </div>
         </div>
@@ -177,6 +195,7 @@ export default function Layout() {
           <button 
             onClick={() => setSidebarOpen(true)}
             className="lg:hidden text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+            aria-label="Ouvrir le menu"
           >
             <Menu size={24} />
           </button>
@@ -190,23 +209,15 @@ export default function Layout() {
             </h1>
           </div>
 
-          <div className="flex items-center space-x-2">
-            {/* Language switcher */}
-            <LanguageSwitcher />
-            {/* Dark mode toggle */}
-            <button onClick={toggleTheme}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-              title={theme === 'dark' ? t('layout.theme_light') : t('layout.theme_dark')}>
-              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-
+          <div className="flex items-center space-x-4">
             {/* Notifications */}
             <div className="relative">
-              <button 
-                onClick={() => setNotificationsOpen(!notificationsOpen)}
-                className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-              >
-                <Bell size={20} />
+                <button 
+                  onClick={() => setNotificationsOpen(!notificationsOpen)}
+                  className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                  aria-label="Notifications"
+                >
+                  <Bell size={20} />
                 {unreadNotifications.length > 0 && (
                   <span className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                     {unreadNotifications.length}
@@ -215,8 +226,8 @@ export default function Layout() {
               </button>
               
               {notificationsOpen && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 z-50">
-                  <div className="p-4 border-b border-gray-100 dark:border-gray-800">
+                <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 z-50">
+                  <div className="p-4 border-b border-gray-100 dark:border-gray-700">
                     <h3 className="font-semibold text-gray-800 dark:text-gray-100">Notifications</h3>
                   </div>
                   <div className="max-h-80 overflow-y-auto">
@@ -230,15 +241,24 @@ export default function Layout() {
                           <div 
                             key={notification.id}
                             onClick={() => markNotificationRead(notification.id)}
-                            className={`p-4 border-b border-gray-50 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 ${
-                              !notification.read ? 'bg-blue-50 dark:bg-blue-900/30' : ''
+                            className={`p-4 border-b border-gray-50 cursor-pointer hover:bg-gray-50 ${
+                              !notification.read ? 'bg-blue-50' : ''
                             }`}
                           >
-                            <p className="font-medium text-gray-800 dark:text-gray-100">{notification.title}</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{notification.message}</p>
+                            <p className="font-medium text-gray-800">{notification.title}</p>
+                            <p className="text-sm text-gray-500 mt-1">{notification.message}</p>
                           </div>
                         ))
                     )}
+                  </div>
+                  <div className="p-3 border-t border-gray-100 dark:border-gray-700">
+                    <Link
+                      to={isAdmin ? '/admin/notifications' : '/employee-dashboard/notifications'}
+                      onClick={() => setNotificationsOpen(false)}
+                      className="block text-center text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      Voir toutes les notifications
+                    </Link>
                   </div>
                 </div>
               )}
@@ -246,8 +266,8 @@ export default function Layout() {
 
             {/* User Avatar */}
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 dark:text-blue-300 font-medium text-sm">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-blue-600 font-medium text-sm">
                   {currentUser?.firstName.charAt(0)}
                 </span>
               </div>

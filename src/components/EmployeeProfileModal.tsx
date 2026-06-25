@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Mail, Phone, Calendar as CalIcon, DollarSign, Briefcase, Building2, User, FileText, Star, Target, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Employee, TimelineEvent } from '../types';
-import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import Avatar from './Avatar';
 import Badge from './Badge';
 import { formatCurrency } from '../utils/format';
@@ -15,23 +15,23 @@ const typeLabels: Record<TimelineEvent['type'], { label: string; color: string }
   hire: { label: 'Embauche', color: 'bg-green-100 text-green-700' },
   promotion: { label: 'Promotion', color: 'bg-blue-100 text-blue-700' },
   contract: { label: 'Contrat', color: 'bg-purple-100 text-purple-700' },
-  leave: { label: 'Congé', color: 'bg-yellow-100 text-yellow-700' },
   review: { label: 'Évaluation', color: 'bg-indigo-100 text-indigo-700' },
   objective: { label: 'Objectif', color: 'bg-orange-100 text-orange-700' },
   certificate: { label: 'Certificat', color: 'bg-teal-100 text-teal-700' },
+  other: { label: 'Autre', color: 'bg-gray-100 text-gray-700' },
 };
 
 export default function EmployeeProfileModal({ employee, onClose }: Props) {
-  const { timelineEvents, performanceReviews, objectives } = useApp();
+  const { timelineEvents, performanceReviews, objectives } = useData();
   const [showTimeline, setShowTimeline] = useState(false);
   const [showContract, setShowContract] = useState(false);
 
-  const empTimeline = timelineEvents
-    .filter((e) => e.employeeId === employee.id)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const empTimeline = (timelineEvents || [])
+    .filter((e: TimelineEvent) => e.employeeId === employee.id)
+    .sort((a: TimelineEvent, b: TimelineEvent) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  const empReviews = performanceReviews.filter((r) => r.employeeId === employee.id);
-  const empObjectives = objectives.filter((o) => o.employeeId === employee.id);
+  const empReviews = (performanceReviews || []).filter((r: { employeeId: string }) => r.employeeId === employee.id);
+  const empObjectives = (objectives || []).filter((o: { employeeId: string }) => o.employeeId === employee.id);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
@@ -160,7 +160,7 @@ export default function EmployeeProfileModal({ employee, onClose }: Props) {
               </button>
               {showTimeline && (
                 <div className="mt-3 space-y-3">
-                  {empTimeline.map((event) => (
+                  {empTimeline.map((event: TimelineEvent) => (
                     <div key={event.id} className="flex items-start space-x-3">
                       <div className={`w-2 h-2 rounded-full mt-1.5 ${typeLabels[event.type]?.color.split(' ')[0] || 'bg-gray-400'}`} />
                       <div className="flex-1">

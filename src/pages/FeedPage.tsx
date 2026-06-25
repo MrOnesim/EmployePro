@@ -1,10 +1,13 @@
 import { useState, useRef } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import { MessageSquare, Heart, Send, User } from 'lucide-react';
+import type { Post, PostComment } from '../types';
 
 export default function FeedPage() {
-  const { currentUser, posts, addPost, likePost, addComment } = useApp();
+  const { currentUser } = useApp();
+  const { posts, addPost, likePost, addComment } = useData();
   const { addToast } = useToast();
   const [content, setContent] = useState('');
   const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
@@ -64,7 +67,7 @@ export default function FeedPage() {
       </div>
 
       <div className="space-y-4">
-        {posts.map((post) => {
+        {posts.map((post: Post) => {
           const isLiked = currentUser && post.likes.includes(currentUser.id);
           return (
             <div key={post.id} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
@@ -91,7 +94,7 @@ export default function FeedPage() {
 
               {post.comments.length > 0 && (
                 <div className="mt-3 space-y-2 border-t border-gray-50 pt-3">
-                  {post.comments.map((c) => (
+                  {post.comments.map((c: PostComment) => (
                     <div key={c.id} className="flex items-start space-x-2">
                       <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
                         <User size={12} className="text-gray-500" />

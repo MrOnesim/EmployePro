@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import { Video, Monitor, MapPin, Laptop, Plus, Search, Filter, Calendar, Clock, Users, Star, AlertTriangle, MessageSquare, ListTodo, ChevronLeft, ChevronRight, Mic, MicOff, VideoOff, Phone } from 'lucide-react';
 import Badge from '../components/Badge';
@@ -37,7 +38,8 @@ const typeLabels: Record<string, string> = {
 const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 
 export default function MeetingPage() {
-  const { meetings, employees, currentUser, currentCompany, addMeeting, addMeetingNote, addMeetingTask, updateMeetingTask, updateParticipantStatus, joinMeeting, leaveMeeting } = useApp();
+  const { currentUser, currentCompany } = useApp();
+  const { meetings, employees, addMeeting, addMeetingNote, addMeetingTask, updateMeetingTask, updateParticipantStatus, joinMeeting, leaveMeeting } = useData();
   const { addToast } = useToast();
   const seeded = useRef(false);
 
@@ -254,7 +256,8 @@ export default function MeetingPage() {
     const acceptedPart = meetings.reduce((a, m) => a + m.participants.filter(p => p.status === 'accepted').length, 0);
     const partRate = totalPart > 0 ? (acceptedPart / totalPart) * 100 : 0;
     const deptBreakdown = meetings.reduce((acc, m) => {
-      acc[m.department] = (acc[m.department] || 0) + 1;
+      const dept = m.department || 'Inconnu';
+      acc[dept] = (acc[dept] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
     const maxDept = Math.max(...Object.values(deptBreakdown), 1);
@@ -385,7 +388,7 @@ export default function MeetingPage() {
           {filteredMeetings.map(meeting => {
             const TypeIcon = typeIcons[meeting.type];
             const statusInfo = statusBadge[meeting.status];
-            const priorityInfo = priorityConfig[meeting.priority];
+              const priorityInfo = meeting.priority ? priorityConfig[meeting.priority] : null;
             return (
               <div key={meeting.id} onClick={() => openDetail(meeting)}
                 className="bg-white dark:bg-gray-900 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-all cursor-pointer">
@@ -393,9 +396,9 @@ export default function MeetingPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-3 mb-2">
                       <h3 className="font-semibold text-gray-800 dark:text-gray-100 truncate">{meeting.title}</h3>
-                      <span className={cn('px-2.5 py-0.5 rounded-full text-xs font-medium', priorityInfo.class)}>
+                      {priorityInfo && <span className={cn('px-2.5 py-0.5 rounded-full text-xs font-medium', priorityInfo.class)}>
                         {priorityInfo.label}
-                      </span>
+                      </span>}
                     </div>
                     <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                       <span className="flex items-center"><Calendar size={14} className="mr-1" />{meeting.date.toLocaleDateString('fr-FR')}</span>
@@ -644,9 +647,9 @@ export default function MeetingPage() {
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant={statusBadge[selectedMeeting.status].variant}>{statusBadge[selectedMeeting.status].label}</Badge>
-              <span className={cn('px-2.5 py-0.5 rounded-full text-xs font-medium', priorityConfig[selectedMeeting.priority].class)}>
+              {selectedMeeting.priority && <span className={cn('px-2.5 py-0.5 rounded-full text-xs font-medium', priorityConfig[selectedMeeting.priority].class)}>
                 {priorityConfig[selectedMeeting.priority].label}
-              </span>
+              </span>}
               <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-1 rounded-full">
                 {selectedMeeting.department}
               </span>
@@ -671,7 +674,7 @@ export default function MeetingPage() {
               </div>
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
                 <p className="text-gray-400 text-xs">Organisateur</p>
-                <p className="font-medium text-gray-800 dark:text-gray-200">{getEmployeeName(selectedMeeting.createdBy)}</p>
+                <p className="font-medium text-gray-800 dark:text-gray-200">{selectedMeeting.createdBy ? getEmployeeName(selectedMeeting.createdBy) : '—'}</p>
               </div>
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
                 <p className="text-gray-400 text-xs">Participants</p>
@@ -733,7 +736,7 @@ export default function MeetingPage() {
               <div className="space-y-2 mb-3">
                 {selectedMeeting.tasks.length === 0 && <p className="text-sm text-gray-400">Aucune tâche</p>}
                 {selectedMeeting.tasks.map(t => {
-                  const assignee = getEmployeeById(t.assignedTo);
+                  const assignee = t.assignedTo ? getEmployeeById(t.assignedTo) : null;
                   return (
                     <div key={t.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="flex items-center space-x-3">
@@ -742,7 +745,7 @@ export default function MeetingPage() {
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                         <div>
                           <p className={cn('text-sm', t.status === 'completed' ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300')}>{t.title}</p>
-                          <p className="text-xs text-gray-400">{assignee ? `${assignee.firstName} ${assignee.lastName}` : '—'} · {t.deadline.toLocaleDateString('fr-FR')}</p>
+                          <p className="text-xs text-gray-400">{assignee ? `${assignee.firstName} ${assignee.lastName}` : '—'} · {t.deadline ? t.deadline.toLocaleDateString('fr-FR') : 'Pas de date'}</p>
                         </div>
                       </div>
                       <select value={t.status} onChange={e => handleUpdateTask(t.id, e.target.value as MeetingTask['status'])}

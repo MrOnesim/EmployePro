@@ -1,46 +1,98 @@
-import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { useToast } from '../context/ToastContext';
-import {
+import { 
   Users, UserCheck, UserX, DollarSign, Wallet, Calendar,
-  Clock, AlertTriangle, Plus, ArrowDownToLine, Landmark, BookOpen, Plane, Store, FileCheck,
+  Clock, AlertTriangle, ArrowUpRight, ArrowDownRight, Target
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import StatCard from '../components/StatCard';
-import Avatar from '../components/Avatar';
-import Badge from '../components/Badge';
-import Modal from '../components/Modal';
-import { formatCurrency } from '../utils/format';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AdminDashboard() {
-  const { employees, attendance, leaves, currentCompany, approveLeave, rejectLeave, deposit, bankAccounts, transactions, enrollments, missions, jobPosts, taxDeclarations, expenses } = useApp();
-  const { addToast } = useToast();
-  const [showDepositModal, setShowDepositModal] = useState(false);
-  const [depositAmount, setDepositAmount] = useState(0);
+  const { employees, attendance, leaves, currentCompany } = useApp();
+  const navigate = useNavigate();
+  const [showKpiSettings, setShowKpiSettings] = useState(false);
+  const [kpiTargets, setKpiTargets] = useState<Record<string, number>>(() => {
+    try {
+      const stored = localStorage.getItem('kpi_targets');
+      return stored ? JSON.parse(stored) : { employees: 30, salary: 15, attendance: 95, balance: 50 };
+    } catch { return { employees: 30, salary: 15, attendance: 95, balance: 50 }; }
+  });
 
-  const activeEmployees = employees.filter((e) => e.status === 'active').length;
-  const pendingLeaves = leaves.filter((l) => l.status === 'pending').length;
+  useEffect(() => {
+    localStorage.setItem('kpi_targets', JSON.stringify(kpiTargets));
+  }, [kpiTargets]);
+
+  const activeEmployees = employees.filter(e => e.status === 'active').length;
+  // const _inactiveEmployees = employees.filter(e => e.status === 'inactive').length;
+  const pendingLeaves = leaves.filter(l => l.status === 'pending').length;
   const totalSalary = employees.reduce((sum, e) => sum + e.salary, 0);
-
-  const todayAttendance = attendance.filter((a) => {
+  
+  const todayAttendance = attendance.filter(a => {
     const today = new Date();
     return new Date(a.date).toDateString() === today.toDateString();
   });
-
-  const presentToday = todayAttendance.filter((a) => a.status === 'present').length;
-  const lateToday = todayAttendance.filter((a) => a.status === 'late').length;
-  const absentToday = todayAttendance.filter((a) => a.status === 'absent').length;
-
-  const companyBalance = currentCompany?.balance || 0;
-  const balanceRatio = totalSalary > 0 ? (companyBalance / totalSalary) * 100 : 0;
+  
+  const presentToday = todayAttendance.filter(a => a.status === 'present').length;
+  const lateToday = todayAttendance.filter(a => a.status === 'late').length;
+  const absentToday = todayAttendance.filter(a => a.status === 'absent').length;
 
   const stats = [
-    { label: 'Total Employés', value: employees.length, icon: Users, color: 'bg-blue-500', change: '+2 ce mois', changeType: 'positive' as const },
-    { label: 'Employés Actifs', value: activeEmployees, icon: UserCheck, color: 'bg-green-500', change: `${presentToday} aujourd'hui`, changeType: 'positive' as const },
-    { label: 'Masse Salariale', value: `${(totalSalary / 1000000).toFixed(1)}M`, suffix: 'FCFA', icon: DollarSign, color: 'bg-orange-500', change: '-5% vs mois dernier', changeType: 'negative' as const },
-    { label: 'Solde Disponible', value: formatCurrency(companyBalance), suffix: 'FCFA', icon: Wallet, color: 'bg-purple-500', change: balanceRatio >= 100 ? 'Suffisant' : `${balanceRatio.toFixed(0)}% de la masse`, changeType: balanceRatio >= 100 ? 'positive' as const : 'warning' as const },
-    { label: 'Congés en attente', value: pendingLeaves, icon: Calendar, color: 'bg-yellow-500', change: pendingLeaves > 0 ? 'À traiter' : 'Tout traité', changeType: pendingLeaves > 0 ? 'warning' as const : 'positive' as const },
-    { label: "Retards aujourd'hui", value: lateToday, icon: AlertTriangle, color: 'bg-red-500', change: lateToday > 0 ? 'Attention' : 'Aucun retard', changeType: lateToday > 0 ? 'negative' as const : 'positive' as const },
+    {
+      label: 'Total Employés',
+      value: employees.length,
+      icon: Users,
+      color: 'bg-blue-500',
+      change: `Objectif: ${kpiTargets.employees}`,
+      changeType: employees.length >= kpiTargets.employees ? 'positive' : 'warning',
+      link: '/admin/employees'
+    },
+    {
+      label: 'Employés Actifs',
+      value: activeEmployees,
+      icon: UserCheck,
+      color: 'bg-green-500',
+      change: `${presentToday} aujourd'hui`,
+      changeType: 'positive',
+      link: '/admin/attendance'
+    },
+    {
+      label: 'Masse Salariale',
+      value: `${(totalSalary / 1000000).toFixed(1)}M`,
+      suffix: 'FCFA',
+      icon: DollarSign,
+      color: 'bg-orange-500',
+      change: `Objectif: ${kpiTargets.salary}M`,
+      changeType: (totalSalary / 1000000) <= kpiTargets.salary ? 'positive' : 'negative',
+      link: '/admin/salary'
+    },
+    {
+      label: 'Solde Disponible',
+      value: `${((currentCompany?.balance || 0) / 1000000).toFixed(1)}M`,
+      suffix: 'FCFA',
+      icon: Wallet,
+      color: 'bg-purple-500',
+      change: `Objectif: ${kpiTargets.balance}M`,
+      changeType: (currentCompany?.balance || 0) / 1000000 >= kpiTargets.balance ? 'positive' : 'negative',
+      link: '/admin/banking'
+    },
+    {
+      label: 'Congés en attente',
+      value: pendingLeaves,
+      icon: Calendar,
+      color: 'bg-yellow-500',
+      change: pendingLeaves > 0 ? 'À traiter' : 'Tout traité',
+      changeType: pendingLeaves > 0 ? 'warning' : 'positive',
+      link: '/admin/leaves'
+    },
+    {
+      label: 'Retards aujourd\'hui',
+      value: lateToday,
+      icon: AlertTriangle,
+      color: 'bg-red-500',
+      change: lateToday > 0 ? 'Attention' : 'Aucun retard',
+      changeType: lateToday > 0 ? 'negative' : 'positive',
+      link: '/admin/attendance'
+    }
   ];
 
   const monthlyData = [
@@ -69,95 +121,97 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold mb-1">Bonjour, {currentCompany?.ownerFirstName} !</h1>
+            <h1 className="text-2xl font-bold mb-1">Bonjour, {currentCompany?.ownerFirstName} ! 👋</h1>
             <p className="text-blue-100">Voici le résumé de votre entreprise aujourd'hui</p>
           </div>
-          <button onClick={() => setShowDepositModal(true)}
-            className="flex items-center space-x-2 bg-white/20 hover:bg-white/30 text-white px-5 py-2.5 rounded-xl font-medium transition-all backdrop-blur-sm border border-white/20">
-            <Plus size={18} /><span>Approvisionner</span>
+          <button onClick={() => setShowKpiSettings(true)} className="flex items-center gap-2 px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors text-sm">
+            <Target size={16} />Objectifs KPI
           </button>
         </div>
       </div>
 
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {stats.map((stat, index) => (
-          <StatCard key={index} {...stat} />
+            <div key={index} onClick={() => navigate(stat.link)} className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">{stat.label}</p>
+                <div className="flex items-baseline space-x-1 mt-1">
+                  <span className="text-3xl font-bold text-gray-800 dark:text-gray-100">{stat.value}</span>
+                  {stat.suffix && <span className="text-gray-500 dark:text-gray-400 text-sm">{stat.suffix}</span>}
+                </div>
+              </div>
+              <div className={`${stat.color} p-3 rounded-xl`}>
+                <stat.icon size={24} className="text-white" />
+              </div>
+            </div>
+            <div className="mt-3 flex items-center text-sm">
+              {stat.changeType === 'positive' && <ArrowUpRight size={16} className="text-green-500 mr-1" />}
+              {stat.changeType === 'negative' && <ArrowDownRight size={16} className="text-red-500 mr-1" />}
+              <span className={`
+                ${stat.changeType === 'positive' ? 'text-green-600 dark:text-green-400' : ''}
+                ${stat.changeType === 'negative' ? 'text-red-600 dark:text-red-400' : ''}
+                ${stat.changeType === 'warning' ? 'text-yellow-600' : ''}
+              `}>
+                {stat.change}
+              </span>
+            </div>
+          </div>
         ))}
       </div>
 
-      <div>
-        <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Vue d'ensemble des modules</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center space-x-4">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Landmark size={22} className="text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Banking</p>
-              <p className="text-lg font-bold text-gray-800 dark:text-gray-100">{bankAccounts.length} / {transactions.length}</p>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center space-x-4">
-            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <BookOpen size={22} className="text-green-600 dark:text-green-400" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Formation</p>
-              <p className="text-lg font-bold text-gray-800 dark:text-gray-100">{enrollments.filter(e => e.status === 'in_progress').length} en cours</p>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center space-x-4">
-            <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-              <Plane size={22} className="text-orange-600 dark:text-orange-400" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Missions</p>
-              <p className="text-lg font-bold text-gray-800 dark:text-gray-100">{missions.filter(m => m.status === 'pending').length} en attente</p>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center space-x-4">
-            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <Store size={22} className="text-purple-600 dark:text-purple-400" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Marketplace</p>
-              <p className="text-lg font-bold text-gray-800 dark:text-gray-100">{jobPosts.filter(p => p.status === 'published').length} offres</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Chart */}
         <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-          <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Évolution des salaires (en millions FCFA)</h3>
+          <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">Évolution des salaires (en millions FCFA)</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={monthlyData}>
                 <defs>
                   <linearGradient id="colorSalaries" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2563EB" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#2563EB" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#2563EB" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#2563EB" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                 <XAxis dataKey="name" stroke="#9CA3AF" />
                 <YAxis stroke="#9CA3AF" />
-                <Tooltip contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB' }} />
-                <Area type="monotone" dataKey="salaries" stroke="#2563EB" fillOpacity={1} fill="url(#colorSalaries)" />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #E5E7EB' }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="salaries" 
+                  stroke="#2563EB" 
+                  fillOpacity={1} 
+                  fill="url(#colorSalaries)" 
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-800 mb-4">Répartition par département</h3>
+        {/* Pie Chart */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">Répartition par département</h3>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={departmentData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={5} dataKey="value">
+                <Pie
+                  data={departmentData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
                   {departmentData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
@@ -171,7 +225,7 @@ export default function AdminDashboard() {
               <div key={index} className="flex items-center justify-between text-sm">
                 <div className="flex items-center">
                   <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: dept.color }} />
-                  <span className="text-gray-600">{dept.name}</span>
+                  <span className="text-gray-600 dark:text-gray-300">{dept.name}</span>
                 </div>
                 <span className="font-medium">{dept.value}</span>
               </div>
@@ -180,25 +234,27 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Bottom Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-800 mb-4">Présences aujourd'hui</h3>
+        {/* Today's Attendance */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">Présences aujourd'hui</h3>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
                   <UserCheck size={20} className="text-white" />
                 </div>
-                <span className="ml-3 font-medium text-gray-800">Présents</span>
+                <span className="ml-3 font-medium text-gray-800 dark:text-gray-100">Présents</span>
               </div>
-              <span className="text-2xl font-bold text-green-600">{presentToday}</span>
+              <span className="text-2xl font-bold text-green-600 dark:text-green-400">{presentToday}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
                   <Clock size={20} className="text-white" />
                 </div>
-                <span className="ml-3 font-medium text-gray-800">En retard</span>
+                <span className="ml-3 font-medium text-gray-800 dark:text-gray-100">En retard</span>
               </div>
               <span className="text-2xl font-bold text-yellow-600">{lateToday}</span>
             </div>
@@ -207,15 +263,16 @@ export default function AdminDashboard() {
                 <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
                   <UserX size={20} className="text-white" />
                 </div>
-                <span className="ml-3 font-medium text-gray-800">Absents</span>
+                <span className="ml-3 font-medium text-gray-800 dark:text-gray-100">Absents</span>
               </div>
-              <span className="text-2xl font-bold text-red-600">{absentToday}</span>
+              <span className="text-2xl font-bold text-red-600 dark:text-red-400">{absentToday}</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-800 mb-4">Activité récente</h3>
+        {/* Recent Activity */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">Activité récente</h3>
           <div className="space-y-4">
             {recentActivity.map((activity) => (
               <div key={activity.id} className="flex items-start space-x-3">
@@ -223,8 +280,8 @@ export default function AdminDashboard() {
                   <activity.icon size={18} />
                 </div>
                 <div className="flex-1">
-                  <p className="text-gray-800 text-sm">{activity.message}</p>
-                  <p className="text-gray-500 text-xs">Il y a {activity.time}</p>
+                  <p className="text-gray-800 dark:text-gray-100 text-sm">{activity.message}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs">Il y a {activity.time}</p>
                 </div>
               </div>
             ))}
@@ -232,61 +289,19 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-          <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Prochaines échéances</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Calendar size={20} className="text-white" />
-                </div>
-                <span className="ml-3 font-medium text-gray-800 dark:text-gray-200">Congés en attente</span>
-              </div>
-              <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">{pendingLeaves}</span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center">
-                  <FileCheck size={20} className="text-white" />
-                </div>
-                <span className="ml-3 font-medium text-gray-800 dark:text-gray-200">Déclarations fiscales</span>
-              </div>
-              <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">{taxDeclarations.filter(t => t.status !== 'paid').length}</span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
-                  <DollarSign size={20} className="text-white" />
-                </div>
-                <span className="ml-3 font-medium text-gray-800 dark:text-gray-200">Dépenses non approuvées</span>
-              </div>
-              <span className="text-2xl font-bold text-red-600 dark:text-red-400">{expenses.filter(e => e.status === 'pending').length}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {companyBalance < totalSalary && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center space-x-3">
-          <AlertTriangle size={20} className="text-amber-600 flex-shrink-0" />
-          <div className="flex-1">
-            <p className="text-amber-800 font-medium">Solde insuffisant</p>
-            <p className="text-amber-700 text-sm">Votre solde ({formatCurrency(companyBalance)}) est inférieur à la masse salariale ({formatCurrency(totalSalary)}). <button onClick={() => setShowDepositModal(true)} className="underline font-medium">Approvisionner</button></p>
-          </div>
-        </div>
-      )}
-
+      {/* Pending Leaves */}
       {pendingLeaves > 0 && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-800">Demandes de congé en attente</h3>
-            <Badge variant="yellow">{pendingLeaves} en attente</Badge>
+            <h3 className="font-semibold text-gray-800 dark:text-gray-100">Demandes de congé en attente</h3>
+            <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-medium">
+              {pendingLeaves} en attente
+            </span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="text-left text-gray-500 text-sm">
+                <tr className="text-left text-gray-500 dark:text-gray-400 text-sm">
                   <th className="pb-3 font-medium">Employé</th>
                   <th className="pb-3 font-medium">Type</th>
                   <th className="pb-3 font-medium">Période</th>
@@ -294,38 +309,41 @@ export default function AdminDashboard() {
                   <th className="pb-3 font-medium">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                 {leaves
-                  .filter((l) => l.status === 'pending')
+                  .filter(l => l.status === 'pending')
                   .slice(0, 3)
                   .map((leave) => {
-                    const employee = employees.find((e) => e.id === leave.employeeId);
-                    if (!employee) return null;
+                    const employee = employees.find(e => e.id === leave.employeeId);
                     return (
                       <tr key={leave.id}>
                         <td className="py-3">
                           <div className="flex items-center">
-                            <Avatar firstName={employee.firstName} lastName={employee.lastName} size="sm" className="mr-3" />
-                            <span className="font-medium text-gray-800">
-                              {employee.firstName} {employee.lastName}
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                              <span className="text-blue-600 dark:text-blue-400 font-medium text-sm">
+                                {employee?.firstName.charAt(0)}{employee?.lastName.charAt(0)}
+                              </span>
+                            </div>
+                            <span className="font-medium text-gray-800 dark:text-gray-100">
+                              {employee?.firstName} {employee?.lastName}
                             </span>
                           </div>
                         </td>
-                        <td className="py-3 text-gray-600">
-                          {leave.type === 'annual' ? 'Annuel' :
-                            leave.type === 'sick' ? 'Maladie' :
-                            leave.type === 'maternity' ? 'Maternité' : 'Spécial'}
+                        <td className="py-3 text-gray-600 dark:text-gray-300">
+                          {leave.type === 'annual' ? 'Annuel' : 
+                           leave.type === 'sick' ? 'Maladie' :
+                           leave.type === 'maternity' ? 'Maternité' : 'Spécial'}
                         </td>
-                        <td className="py-3 text-gray-600">
+                        <td className="py-3 text-gray-600 dark:text-gray-300">
                           {new Date(leave.startDate).toLocaleDateString('fr-FR')} - {new Date(leave.endDate).toLocaleDateString('fr-FR')}
                         </td>
-                        <td className="py-3 text-gray-600 max-w-[200px] truncate">{leave.reason}</td>
+                        <td className="py-3 text-gray-600 dark:text-gray-300 max-w-[200px] truncate">{leave.reason}</td>
                         <td className="py-3">
                           <div className="flex space-x-2">
-                            <button onClick={() => approveLeave(leave.id)} className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200">
+                            <button className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200">
                               Approuver
                             </button>
-                            <button onClick={() => rejectLeave(leave.id)} className="px-3 py-1 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200">
+                            <button className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200">
                               Refuser
                             </button>
                           </div>
@@ -338,33 +356,35 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
-      <Modal open={showDepositModal} onClose={() => setShowDepositModal(false)} title="Approvisionner le compte" maxWidth="sm">
-        <div className="space-y-4">
-          <div className="bg-blue-50 rounded-xl p-4 text-sm text-blue-700">
-            <p className="font-medium mb-1">Solde actuel : {formatCurrency(companyBalance)}</p>
-            <p>Entrez le montant à déposer sur le compte de l'entreprise pour payer les salaires.</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Montant (FCFA)</label>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-              <input type="number" value={depositAmount || ''} onChange={(e) => setDepositAmount(parseFloat(e.target.value) || 0)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-lg font-medium" placeholder="500000" min={0} />
+
+      {/* KPI Targets Modal */}
+      {showKpiSettings && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Objectifs KPI</h3>
+            <div className="space-y-4">
+              {[
+                { key: 'employees', label: 'Effectif cible', suffix: 'employés', value: kpiTargets.employees },
+                { key: 'salary', label: 'Masse salariale max', suffix: 'M FCFA', value: kpiTargets.salary },
+                { key: 'balance', label: 'Solde minimum', suffix: 'M FCFA', value: kpiTargets.balance },
+              ].map(item => (
+                <div key={item.key}>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{item.label}</label>
+                  <div className="flex items-center gap-2">
+                    <input type="number" value={item.value} onChange={e => setKpiTargets(prev => ({ ...prev, [item.key]: parseFloat(e.target.value) || 0 }))}
+                      className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200" />
+                    <span className="text-sm text-gray-500 whitespace-nowrap">{item.suffix}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button onClick={() => setShowKpiSettings(false)} className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">Fermer</button>
+              <button onClick={() => { setShowKpiSettings(false); }} className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Enregistrer</button>
             </div>
           </div>
-          <div className="flex space-x-3">
-            <button onClick={() => { setDepositAmount(500000); }} className="flex-1 bg-gray-100 text-gray-600 py-2 rounded-lg text-sm font-medium hover:bg-gray-200">50 000</button>
-            <button onClick={() => { setDepositAmount(1000000); }} className="flex-1 bg-gray-100 text-gray-600 py-2 rounded-lg text-sm font-medium hover:bg-gray-200">100 000</button>
-            <button onClick={() => { setDepositAmount(5000000); }} className="flex-1 bg-gray-100 text-gray-600 py-2 rounded-lg text-sm font-medium hover:bg-gray-200">500 000</button>
-            <button onClick={() => { setDepositAmount(10000000); }} className="flex-1 bg-gray-100 text-gray-600 py-2 rounded-lg text-sm font-medium hover:bg-gray-200">1 000 000</button>
-          </div>
-          <button onClick={() => { if (depositAmount > 0) { deposit(depositAmount); setShowDepositModal(false); setDepositAmount(0); addToast(`${formatCurrency(depositAmount)} déposé avec succès`, 'success'); } }}
-            disabled={depositAmount <= 0}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
-            <ArrowDownToLine size={18} /><span>Déposer {depositAmount > 0 ? formatCurrency(depositAmount) : ''}</span>
-          </button>
         </div>
-      </Modal>
+      )}
     </div>
   );
 }

@@ -162,6 +162,7 @@ export function canAccessMenu(userRole: UserRole | undefined, path: string): boo
     '/admin/salary': 'view_salary',
     '/admin/attendance': 'view_attendance',
     '/admin/leaves': 'view_leaves',
+    '/admin/leave-policy': 'manage_leaves',
     '/admin/payslips': 'view_payslips',
     '/admin/performance': 'view_performance',
     '/admin/recruitment': 'view_recruitment',
@@ -169,6 +170,7 @@ export function canAccessMenu(userRole: UserRole | undefined, path: string): boo
     '/admin/documents': 'view_documents',
     '/admin/calendar': 'view_calendar',
     '/admin/messages': 'view_messages',
+    '/admin/notifications': 'view_messages',
     '/admin/reports': 'view_reports',
     '/admin/banking': 'view_banking',
     '/admin/tax': 'view_tax',
@@ -183,6 +185,8 @@ export function canAccessMenu(userRole: UserRole | undefined, path: string): boo
     '/admin/wellness': 'view_wellness',
     '/admin/fintech': 'view_fintech',
     '/admin/signatures': 'view_signatures',
+    '/admin/roles': 'manage_settings',
+    '/admin/onboarding': 'manage_settings',
     '/admin/settings': 'view_settings',
     '/employee/vault': 'view_vault',
     '/employee/rewards': 'view_rewards',
@@ -193,6 +197,8 @@ export function canAccessMenu(userRole: UserRole | undefined, path: string): boo
     '/employee/leaves': 'view_leaves',
     '/employee/payslips': 'view_payslips',
     '/employee/messages': 'view_messages',
+    '/employee/notifications': 'view_messages',
+    '/employee-dashboard/notifications': 'view_messages',
     '/employee/calendar': 'view_calendar',
   };
   const perm = pathPermissionMap[path];

@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
-import type { TaxDeclaration, BankTransaction, Mission, ExpenseReport } from '../types';
+import type { TaxDeclaration, BankTransaction, Mission, ExpenseReport, Payslip, Employee } from '../types';
 
 function formatDate(d: Date | string): string {
   return new Date(d).toLocaleDateString('fr-FR');
@@ -82,4 +82,60 @@ export function exportExpensesPdf(expenses: ExpenseReport[]) {
     body: rows,
   });
   doc.save('notes-de-frais.pdf');
+}
+
+const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+export function exportPayslipPDF(payslip: Payslip, employee: Employee, companyName: string) {
+  const doc = new jsPDF();
+  const pageW = 210;
+
+  // Header
+  doc.setFillColor(37, 99, 235);
+  doc.rect(0, 0, pageW, 40, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(20);
+  doc.text(companyName, 14, 18);
+  doc.setFontSize(12);
+  doc.text('BULLETIN DE SALAIRE', 14, 28);
+  doc.text(`${MONTHS_FR[payslip.month - 1]} ${payslip.year}`, 14, 36);
+
+  // Employee info
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(11);
+  doc.text(`Employé: ${employee.firstName} ${employee.lastName}`, 14, 55);
+  doc.text(`Poste: ${employee.position}`, 14, 63);
+  doc.text(`Département: ${employee.department}`, 14, 71);
+  doc.text(`Matricule: ${employee.id}`, 14, 79);
+
+  // Salary breakdown
+  const startY = 95;
+  (doc as any).autoTable({
+    startY,
+    head: [['Rubrique', 'Montant']],
+    body: [
+      ['Salaire de base', formatCurrency(payslip.basicSalary)],
+      ['Primes et bonus', formatCurrency(payslip.bonuses)],
+      ['Déductions', formatCurrency(payslip.deductions)],
+    ],
+    theme: 'plain',
+    headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
+    styles: { fontSize: 11 },
+  });
+
+  // Net salary
+  const netY = (doc as any).lastAutoTable.finalY + 10;
+  doc.setFillColor(239, 246, 255);
+  doc.rect(14, netY, pageW - 28, 14, 'F');
+  doc.setFontSize(13);
+  doc.setFont('Helvetica', 'bold');
+  doc.text(`SALAIRE NET À PAYER: ${formatCurrency(payslip.netSalary)}`, 18, netY + 10);
+  doc.setFont('Helvetica', 'normal');
+
+  // Footer
+  doc.setFontSize(8);
+  doc.setTextColor(150, 150, 150);
+  doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')} · Document non contractuel`, 14, 285);
+
+  doc.save(`bulletin-${payslip.month}-${payslip.year}-${employee.firstName}-${employee.lastName}.pdf`);
 }

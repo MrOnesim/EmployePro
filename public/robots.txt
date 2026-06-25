@@ -1,3 +1,7 @@
 User-agent: *
 Allow: /
-Sitemap: https://employepro.africa/sitemap.xml
+Disallow: /admin/
+Disallow: /employee-dashboard/
+Disallow: /scan
+
+Sitemap: https://employepro.com/sitemap.xml

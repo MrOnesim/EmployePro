@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import { Heart, Smile, Frown, Brain, Activity, Plus, BarChart3 } from 'lucide-react';
 import Modal from '../components/Modal';
@@ -54,7 +55,8 @@ function StarRating({ value, onChange }: { value: number; onChange?: (v: number)
 const questionTypeDefault = { text: '', type: 'rating' as WellnessQuestion['type'], category: 'satisfaction' as WellnessQuestion['category'], options: '' };
 
 export default function WellnessPage() {
-  const { wellnessSurveys, wellnessResponses, addWellnessSurvey, submitWellnessResponse, employees, currentUser } = useApp();
+  const { currentUser } = useApp();
+  const { wellnessSurveys, wellnessResponses, addWellnessSurvey, submitWellnessResponse, employees } = useData();
   const { addToast } = useToast();
 
   const [activeTab, setActiveTab] = useState<'surveys' | 'dashboard'>('surveys');
@@ -91,7 +93,7 @@ export default function WellnessPage() {
     submitWellnessResponse({
       surveyId: selectedSurvey.id,
       employeeId: currentUser.id,
-      answers: allQuestions.map((q) => ({ questionId: q.id, value: answers[q.id] })),
+      answers: Object.fromEntries(allQuestions.map((q) => [q.id, answers[q.id]])) as Record<string, string | number | boolean>,
       submittedAt: new Date(),
       anonymous,
     });
@@ -157,7 +159,7 @@ export default function WellnessPage() {
 
   const calcAverage = (responses: WellnessResponse[], questionId: string): number => {
     const vals = responses
-      .map((r) => r.answers.find((a) => a.questionId === questionId)?.value)
+      .map((r) => r.answers[questionId])
       .filter((v): v is number => typeof v === 'number');
     if (vals.length === 0) return 0;
     return vals.reduce((s, v) => s + v, 0) / vals.length;
@@ -181,7 +183,7 @@ export default function WellnessPage() {
   };
 
   const getResponseSummaryText = (question: WellnessQuestion, responses: WellnessResponse[]) => {
-    const answers = responses.map((r) => r.answers.find((a) => a.questionId === question.id)?.value).filter((v) => v !== undefined);
+    const answers = responses.map((r) => r.answers[question.id]).filter((v) => v !== undefined);
     if (answers.length === 0) return 'Aucune réponse';
     if (question.type === 'rating') {
       const nums = answers.filter((v): v is number => typeof v === 'number');

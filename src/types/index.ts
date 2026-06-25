@@ -1,42 +1,4 @@
-// Types for EmployéPro Africa
-
 export type UserRole = 'admin' | 'rh' | 'manager' | 'employee';
-
-export interface Team {
-  id: string;
-  name: string;
-  description: string;
-  leaderId: string;
-  memberIds: string[];
-  createdAt: Date;
-}
-
-export interface Post {
-  id: string;
-  authorId: string;
-  authorName: string;
-  content: string;
-  createdAt: Date;
-  likes: string[];
-  comments: PostComment[];
-}
-
-export interface PostComment {
-  id: string;
-  authorId: string;
-  authorName: string;
-  content: string;
-  createdAt: Date;
-}
-
-export interface PayrollConfig {
-  country: string;
-  countryName: string;
-  bonusRate: number;
-  deductionRate: number;
-  currency: string;
-  currencyLocale: string;
-}
 
 export interface Company {
   id: string;
@@ -86,7 +48,6 @@ export interface Attendance {
   status: 'present' | 'absent' | 'late' | 'half-day';
   gpsCheckIn?: GPSLocation;
   gpsCheckOut?: GPSLocation;
-  biometricVerified?: boolean;
 }
 
 export interface Leave {
@@ -98,6 +59,7 @@ export interface Leave {
   reason: string;
   status: 'pending' | 'approved' | 'rejected';
   approvedBy?: string;
+  approvalComment?: string;
 }
 
 export interface Payslip {
@@ -117,7 +79,7 @@ export interface Notification {
   userId: string;
   title: string;
   message: string;
-  type: 'invitation' | 'payment' | 'leave' | 'attendance' | 'payslip' | 'recruitment' | 'review' | 'objective' | 'contract';
+  type: 'invitation' | 'payment' | 'leave' | 'attendance' | 'payslip' | 'recruitment' | 'objective' | 'review' | 'contract' | 'document';
   read: boolean;
   createdAt: Date;
 }
@@ -130,10 +92,25 @@ export interface Invitation {
   sentAt: Date;
 }
 
+export interface LeaveBalance {
+  employeeId: string;
+  annual: { total: number; used: number };
+  sick: { total: number; used: number };
+  maternity: { total: number; used: number };
+  special: { total: number; used: number };
+}
+
+export interface LeavePolicy {
+  annual: number;
+  sick: number;
+  maternity: number;
+  special: number;
+}
+
 export interface Document {
   id: string;
   name: string;
-  type: 'contract' | 'certificate' | 'report' | 'policy' | 'other';
+  type: string;
   department: string;
   uploadedBy: string;
   uploadedAt: Date;
@@ -148,7 +125,7 @@ export interface CalendarEvent {
   date: string;
   time: string;
   location: string;
-  type: 'birthday' | 'meeting' | 'holiday' | 'team' | 'announcement' | 'other';
+  type: 'meeting' | 'birthday' | 'holiday' | 'team' | 'training' | 'other';
   attendees: string[];
   allDay: boolean;
 }
@@ -174,19 +151,41 @@ export interface Conversation {
   messages: ChatMessage[];
 }
 
-export type ContractType = 'CDI' | 'CDD' | 'stage' | 'freelance' | 'autre';
-
-export interface Contract {
-  type: ContractType;
-  startDate: Date;
-  endDate?: Date;
-  salary: number;
-  position: string;
-  department: string;
-  documentUrl?: string;
+export interface Team {
+  id: string;
+  name: string;
+  description: string;
+  leaderId: string;
+  memberIds: string[];
+  createdAt: Date;
 }
 
-export type CandidateStatus = 'received' | 'interview' | 'accepted' | 'rejected';
+export interface PostComment {
+  id: string;
+  authorId: string;
+  authorName: string;
+  content: string;
+  createdAt: Date;
+}
+
+export interface Post {
+  id: string;
+  authorId: string;
+  authorName: string;
+  content: string;
+  createdAt: Date;
+  likes: string[];
+  comments: PostComment[];
+}
+
+export interface PayrollConfig {
+  country: string;
+  countryName: string;
+  bonusRate: number;
+  deductionRate: number;
+  currency: string;
+  currencyLocale: string;
+}
 
 export interface JobOffer {
   id: string;
@@ -196,11 +195,14 @@ export interface JobOffer {
   requirements: string;
   salary: number;
   location: string;
-  type: 'CDI' | 'CDD' | 'stage' | 'freelance';
+  type: string;
   status: 'open' | 'closed' | 'draft';
   createdAt: Date;
   createdBy: string;
 }
+
+export type CandidateStatus = 'received' | 'interview' | 'accepted' | 'rejected';
+export type ObjectiveStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled';
 
 export interface Candidate {
   id: string;
@@ -210,14 +212,12 @@ export interface Candidate {
   email: string;
   phone: string;
   status: CandidateStatus;
-  resumeUrl?: string;
-  coverLetter?: string;
   appliedAt: Date;
+  coverLetter?: string;
+  resumeUrl?: string;
   interviewDate?: Date;
   notes?: string;
 }
-
-export type ObjectiveStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled';
 
 export interface Objective {
   id: string;
@@ -225,7 +225,7 @@ export interface Objective {
   title: string;
   description: string;
   deadline: Date;
-  status: ObjectiveStatus;
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
   category: string;
   createdAt: Date;
   createdBy: string;
@@ -248,17 +248,21 @@ export interface PerformanceReview {
 export interface TimelineEvent {
   id: string;
   employeeId: string;
-  type: 'hire' | 'promotion' | 'contract' | 'leave' | 'review' | 'objective' | 'certificate';
+  type: 'hire' | 'promotion' | 'objective' | 'review' | 'contract' | 'certificate' | 'other';
   title: string;
   description: string;
   date: Date;
-  metadata?: Record<string, string>;
 }
 
-export interface GPSLocation {
-  lat: number;
-  lng: number;
-  accuracy?: number;
+export interface Contract {
+  id: string;
+  type: 'CDI' | 'CDD' | 'stage' | 'freelance';
+  position: string;
+  startDate: Date;
+  endDate?: Date;
+  salary: number;
+  status: 'active' | 'expired' | 'terminated';
+  documentUrl?: string;
 }
 
 export interface BankAccount {
@@ -278,7 +282,7 @@ export interface BankAccount {
 export interface BankTransaction {
   id: string;
   companyId: string;
-  type: 'deposit' | 'withdrawal' | 'payment' | 'fee' | 'transfer';
+  type: 'deposit' | 'payment' | 'transfer' | 'withdrawal' | 'fee';
   amount: number;
   currency: string;
   description: string;
@@ -293,13 +297,21 @@ export interface TaxDeclaration {
   companyId: string;
   country: string;
   period: string;
-  type: 'IS' | 'IR' | 'TVA' | 'CNSS' | 'IRPP' | 'CET' | 'autre';
+  type: 'IRPP' | 'CNSS' | 'TVA' | 'IS' | 'other';
   totalSalary: number;
   totalTax: number;
   status: 'draft' | 'submitted' | 'paid';
   dueDate: Date;
   submittedAt?: Date;
-  documentUrl?: string;
+}
+
+export interface Lesson {
+  id: string;
+  courseId: string;
+  title: string;
+  content: string;
+  duration: number;
+  order: number;
 }
 
 export interface Course {
@@ -310,18 +322,8 @@ export interface Course {
   duration: number;
   instructor: string;
   enrolledCount: number;
-  lessons: CourseLesson[];
+  lessons: Lesson[];
   createdAt: Date;
-}
-
-export interface CourseLesson {
-  id: string;
-  courseId: string;
-  title: string;
-  content: string;
-  duration: number;
-  order: number;
-  videoUrl?: string;
 }
 
 export interface Enrollment {
@@ -359,7 +361,6 @@ export interface ExpenseReport {
   currency: string;
   date: Date;
   description: string;
-  receiptUrl?: string;
   status: 'pending' | 'approved' | 'rejected';
   approvedBy?: string;
 }
@@ -372,10 +373,10 @@ export interface JobPost {
   description: string;
   requirements: string;
   location: string;
-  type: 'CDI' | 'CDD' | 'stage' | 'freelance';
+  type: string;
   salary: string;
   category: string;
-  status: 'published' | 'closed';
+  status: 'draft' | 'published' | 'closed';
   featured: boolean;
   views: number;
   applications: number;
@@ -383,62 +384,69 @@ export interface JobPost {
   expiresAt: Date;
 }
 
-export type Department = 
-  | 'Direction'
-  | 'Ressources Humaines'
-  | 'Finance'
-  | 'Informatique'
-  | 'Marketing'
-  | 'Ventes'
-  | 'Operations'
-  | 'Juridique'
-  | 'Autre';
+export interface GPSLocation {
+  latitude: number;
+  longitude: number;
+  accuracy?: number;
+}
 
-export type MeetingType = 'physical' | 'online' | 'hybrid';
-export type MeetingPriority = 'normal' | 'important' | 'urgent';
-export type MeetingStatus = 'scheduled' | 'ongoing' | 'completed' | 'cancelled';
-export type ParticipantStatus = 'pending' | 'accepted' | 'declined' | 'tentative';
-
-export interface MeetingParticipant {
-  employeeId: string;
-  status: ParticipantStatus;
-  joinedAt?: Date;
-  leftAt?: Date;
-  attendanceDuration?: number;
+export interface MeetingNote {
+  id: string;
+  meetingId: string;
+  content: string;
+  authorId: string;
+  type?: 'comment' | 'action' | 'decision';
+  createdAt: Date;
 }
 
 export interface MeetingTask {
   id: string;
   meetingId: string;
   title: string;
-  assignedTo: string;
-  deadline: Date;
+  assignedTo?: string;
+  deadline?: Date;
   status: 'pending' | 'in_progress' | 'completed';
   createdAt: Date;
 }
 
-export interface MeetingNote {
+export type ParticipantStatus = 'pending' | 'accepted' | 'declined' | 'tentative';
+
+export interface MeetingParticipant {
+  employeeId: string;
+  name?: string;
+  email?: string;
+  status: ParticipantStatus;
+  joinedAt?: Date;
+  leftAt?: Date;
+  attendanceDuration?: number;
+}
+
+export interface Meeting {
   id: string;
-  meetingId: string;
-  authorId: string;
-  content: string;
-  type: 'comment' | 'decision' | 'action';
+  companyId?: string;
+  title: string;
+  description: string;
+  date: Date;
+  startTime: string;
+  endTime: string;
+  department?: string;
+  type: 'physical' | 'online' | 'hybrid';
+  priority?: 'normal' | 'important' | 'urgent';
+  createdBy?: string;
+  participants: MeetingParticipant[];
+  notes: MeetingNote[];
+  tasks: MeetingTask[];
+  agenda?: string[];
+  virtualRoomUrl?: string;
+  summary?: string;
+  status: 'scheduled' | 'ongoing' | 'completed' | 'cancelled';
   createdAt: Date;
 }
 
-export interface MeetingAgenda {
-  id: string;
-  meetingId: string;
-  title: string;
-  duration: number;
-  order: number;
-}
-
-// Coffre-fort numérique employé
 export interface EmployeeVaultItem {
   id: string;
   employeeId: string;
-  type: 'contract' | 'diploma' | 'id_card' | 'payslip' | 'certificate' | 'evaluation';
+  type: 'contract' | 'diploma' | 'id_card' | 'certificate' | 'evaluation' | 'payslip' | 'other';
   name: string;
   fileUrl?: string;
   uploadedAt: Date;
@@ -446,7 +454,6 @@ export interface EmployeeVaultItem {
   status: 'active' | 'expired' | 'archived';
 }
 
-// Système de récompenses
 export interface RewardTransaction {
   id: string;
   employeeId: string;
@@ -462,18 +469,16 @@ export interface RewardCatalog {
   description: string;
   pointsCost: number;
   stock: number;
-  imageUrl?: string;
   category: 'bonus' | 'gift' | 'advantage' | 'training';
   active: boolean;
 }
 
-// Gestion du matériel
 export interface Equipment {
   id: string;
   companyId: string;
   name: string;
   type: 'computer' | 'phone' | 'vehicle' | 'access_card' | 'other';
-  serialNumber?: string;
+  serialNumber: string;
   status: 'available' | 'assigned' | 'maintenance' | 'retired';
   purchaseDate?: Date;
   purchasePrice?: number;
@@ -492,10 +497,16 @@ export interface EquipmentAssignment {
   returnedAt?: Date;
   conditionAtAssignment: 'good' | 'fair' | 'damaged';
   conditionAtReturn?: 'good' | 'fair' | 'damaged';
-  notes?: string;
 }
 
-// Bien-être employé
+export interface WellnessQuestion {
+  id: string;
+  text: string;
+  type: 'rating' | 'yesno' | 'text' | 'multiple_choice' | 'multiple';
+  category: 'satisfaction' | 'stress' | 'motivation' | 'workload' | 'environment' | 'other';
+  options?: string[];
+}
+
 export interface WellnessSurvey {
   id: string;
   title: string;
@@ -506,41 +517,15 @@ export interface WellnessSurvey {
   expiresAt?: Date;
 }
 
-export interface WellnessQuestion {
-  id: string;
-  text: string;
-  type: 'rating' | 'yesno' | 'text' | 'multiple';
-  category: 'satisfaction' | 'stress' | 'motivation' | 'workload' | 'environment';
-  options?: string[];
-}
-
 export interface WellnessResponse {
   id: string;
   surveyId: string;
   employeeId: string;
-  answers: WellnessAnswer[];
+  answers: Record<string, string | number | boolean>;
   submittedAt: Date;
-  anonymous: boolean;
+  anonymous?: boolean;
 }
 
-export interface WellnessAnswer {
-  questionId: string;
-  value: number | string | boolean;
-}
-
-export interface WellnessScore {
-  surveyId: string;
-  period: string;
-  satisfactionAvg: number;
-  stressAvg: number;
-  motivationAvg: number;
-  workloadAvg: number;
-  environmentAvg: number;
-  participationRate: number;
-  totalResponses: number;
-}
-
-// Banque salariale fintech
 export interface SalaryAdvance {
   id: string;
   employeeId: string;
@@ -552,7 +537,7 @@ export interface SalaryAdvance {
   paidAt?: Date;
   rejectedAt?: Date;
   repaymentDate?: Date;
-  repaymentStatus: 'pending' | 'partial' | 'repaid';
+  repaymentStatus: 'pending' | 'repaid' | 'overdue';
   repaymentAmount?: number;
   reason: string;
   approvedBy?: string;
@@ -567,18 +552,7 @@ export interface SalaryTransfer {
   status: 'pending' | 'completed' | 'failed';
   createdAt: Date;
   completedAt?: Date;
-  description?: string;
-}
-
-// Quiz et certificats formations
-export interface Quiz {
-  id: string;
-  courseId: string;
-  title: string;
   description: string;
-  questions: QuizQuestion[];
-  passingScore: number;
-  timeLimit?: number;
 }
 
 export interface QuizQuestion {
@@ -588,6 +562,16 @@ export interface QuizQuestion {
   options: string[];
   correctAnswer: number;
   points: number;
+}
+
+export interface Quiz {
+  id: string;
+  courseId: string;
+  title: string;
+  description: string;
+  questions: QuizQuestion[];
+  passingScore: number;
+  timeLimit: number;
 }
 
 export interface QuizAttempt {
@@ -600,7 +584,7 @@ export interface QuizAttempt {
   answers: number[];
   passed: boolean;
   startedAt: Date;
-  completedAt?: Date;
+  completedAt: Date;
 }
 
 export interface Certificate {
@@ -612,53 +596,35 @@ export interface Certificate {
   certificateUrl?: string;
 }
 
-export interface Meeting {
-  id: string;
-  companyId: string;
-  title: string;
-  description: string;
-  date: Date;
-  startTime: string;
-  endTime: string;
-  department: string;
-  participants: MeetingParticipant[];
-  type: MeetingType;
-  priority: MeetingPriority;
-  status: MeetingStatus;
-  virtualRoomUrl?: string;
-  recordingUrl?: string;
-  notes: MeetingNote[];
-  tasks: MeetingTask[];
-  agenda: MeetingAgenda[];
-  summary?: string;
-  createdBy: string;
-  createdAt: Date;
-}
-
-// Signature électronique
-export interface SignatureRequest {
-  id: string;
-  documentId?: string;
-  documentName: string;
-  documentType: 'contract' | 'amendment' | 'policy' | 'nda' | 'internal' | 'other';
-  initiatedBy: string;
-  initiatedByName: string;
-  initiatedAt: Date;
-  status: 'draft' | 'sent' | 'signed' | 'completed' | 'rejected' | 'expired';
-  recipients: SignatureRecipient[];
-  message?: string;
-  completedAt?: Date;
-  expiresAt?: Date;
-}
-
 export interface SignatureRecipient {
   employeeId: string;
   name: string;
   email: string;
-  status: 'pending' | 'viewed' | 'signed' | 'rejected';
+  status: 'pending' | 'signed' | 'rejected';
   signedAt?: Date;
   signatureDataUrl?: string;
   rejectionReason?: string;
+}
+
+export interface SignatureRequest {
+  id: string;
+  documentName: string;
+  documentType: 'contract' | 'amendment' | 'policy' | 'nda' | 'other';
+  initiatedBy: string;
+  initiatedByName: string;
+  initiatedAt: Date;
+  status: 'draft' | 'sent' | 'signed' | 'completed' | 'rejected';
+  recipients: SignatureRecipient[];
+  message?: string;
+  documentId?: string;
+  expiresAt?: Date;
+  completedAt?: Date;
+}
+
+export interface SignaturePlaceholder {
+  key: string;
+  label: string;
+  fieldType: string;
 }
 
 export interface SignatureTemplate {
@@ -667,6 +633,54 @@ export interface SignatureTemplate {
   description: string;
   documentType: string;
   content: string;
-  placeholders: { key: string; label: string; fieldType: 'text' | 'date' | 'employee_name' | 'employee_position' | 'salary' | 'company_name' }[];
+  placeholders: SignaturePlaceholder[];
   createdAt: Date;
+}
+
+export type Department = 
+  | 'Direction'
+  | 'Ressources Humaines'
+  | 'Finance'
+  | 'Informatique'
+  | 'Marketing'
+  | 'Ventes'
+  | 'Operations'
+  | 'Juridique'
+  | 'Autre';
+
+export type QRCodeType = 'arrival' | 'lunch_start' | 'lunch_end' | 'departure';
+
+export interface QRCodeConfig {
+  arrivalTime: string;
+  lunchStartTime: string;
+  lunchEndTime: string;
+  departureTime: string;
+  lateTolerance: number;
+  gpsRadius: number;
+  requireSelfie: boolean;
+  companyLat: number;
+  companyLng: number;
+}
+
+export interface QRCodeSession {
+  id: string;
+  companyId: string;
+  date: string;
+  type: QRCodeType;
+  code: string;
+  generatedAt: string;
+  expiresAt: string;
+}
+
+export interface QRScanLog {
+  id: string;
+  employeeId: string;
+  sessionId: string;
+  type: QRCodeType;
+  scannedAt: string;
+  latitude?: number;
+  longitude?: number;
+  selfie?: string;
+  status: 'approved' | 'rejected' | 'pending';
+  rejectReason?: string;
 }

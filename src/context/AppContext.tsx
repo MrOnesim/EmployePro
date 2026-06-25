@@ -1,12 +1,13 @@
-import { createContext, useContext, useCallback, type ReactNode } from 'react';
-import type { Company, Employee, Attendance, Leave, Payslip, Notification, Invitation, Document as AppDocument, CalendarEvent, Conversation, ChatMessage, Team, Post, PayrollConfig, PostComment, JobOffer, Candidate, Objective, PerformanceReview, TimelineEvent, Contract, BankAccount, BankTransaction, TaxDeclaration, Course, Enrollment, Mission, ExpenseReport, JobPost, GPSLocation, Meeting, MeetingNote, MeetingTask, ParticipantStatus, EmployeeVaultItem, RewardTransaction, RewardCatalog, Equipment, EquipmentAssignment, WellnessSurvey, WellnessResponse, SalaryAdvance, SalaryTransfer, Quiz, QuizAttempt, Certificate, SignatureRequest, SignatureTemplate } from '../types';
-import { AuthProvider, useAuth } from './AuthContext';
-import { DataProvider, useData } from './DataContext';
+import { createContext, useContext, useState, ReactNode } from 'react';
+import { Company, Employee, Attendance, Leave, Payslip, Notification, Invitation } from '../types';
 
 interface AppState {
+  // Auth state
   isLoggedIn: boolean;
   currentUser: Employee | null;
   currentCompany: Company | null;
+  
+  // Data
   companies: Company[];
   employees: Employee[];
   attendance: Attendance[];
@@ -14,360 +15,587 @@ interface AppState {
   payslips: Payslip[];
   notifications: Notification[];
   invitations: Invitation[];
-  documents: AppDocument[];
-  events: CalendarEvent[];
-  conversations: Conversation[];
-  teams: Team[];
-  posts: Post[];
-  payrollConfig: PayrollConfig;
-  signatures: Record<string, string>;
-  addDocument: (doc: Omit<AppDocument, 'id'>) => void;
-  deleteDocument: (id: string) => void;
-  addEvent: (event: Omit<CalendarEvent, 'id'>) => void;
-  addMessage: (conversationId: string, message: Omit<ChatMessage, 'id'>) => void;
-  addConversation: (participant: { id: string; name: string; position: string }) => void;
-  readConversation: (conversationId: string) => void;
+  
+  // Actions
   login: (email: string, password: string, type: 'company' | 'employee') => boolean;
   logout: () => void;
   registerCompany: (company: Omit<Company, 'id' | 'uniqueId' | 'createdAt' | 'balance'>) => void;
   addEmployee: (employee: Omit<Employee, 'id'>) => void;
-  addMultipleEmployees: (emps: Omit<Employee, 'id'>[]) => void;
   updateEmployee: (id: string, data: Partial<Employee>) => void;
   deleteEmployee: (id: string) => void;
   sendInvitation: (email: string) => void;
   acceptInvitation: (id: string) => void;
-  clockIn: (gpsLocation?: GPSLocation) => void;
+  clockIn: () => void;
   startBreak: () => void;
   endBreak: () => void;
-  clockOut: (gpsLocation?: GPSLocation) => void;
+  clockOut: () => void;
   requestLeave: (leave: Omit<Leave, 'id'>) => void;
-  approveLeave: (id: string) => void;
-  rejectLeave: (id: string) => void;
-  deposit: (amount: number) => void;
-  processPayment: (employeeId: string, amount: number) => boolean;
+  approveLeave: (id: string, comment?: string) => void;
+  rejectLeave: (id: string, comment?: string) => void;
+  processPayment: (employeeId: string, amount: number) => void;
   generatePayslip: (employeeId: string) => void;
   markNotificationRead: (id: string) => void;
+  markAllNotificationsRead: () => void;
   addNotification: (notification: Omit<Notification, 'id' | 'createdAt'>) => void;
-  addTeam: (team: Omit<Team, 'id' | 'createdAt'>) => void;
-  updateTeam: (id: string, data: Partial<Team>) => void;
-  deleteTeam: (id: string) => void;
-  addPost: (post: Omit<Post, 'id' | 'createdAt' | 'likes' | 'comments'>) => void;
-  likePost: (postId: string, userId: string) => void;
-  addComment: (postId: string, comment: Omit<PostComment, 'id' | 'createdAt'>) => void;
-  updatePayrollConfig: (config: Partial<PayrollConfig>) => void;
-  signDocument: (docId: string, signatureDataUrl: string) => void;
-  getSignatures: () => Record<string, string>;
-  jobOffers: JobOffer[];
-  candidates: Candidate[];
-  objectives: Objective[];
-  performanceReviews: PerformanceReview[];
-  timelineEvents: TimelineEvent[];
-  addJobOffer: (offer: Omit<JobOffer, 'id' | 'createdAt'>) => void;
-  updateJobOffer: (id: string, data: Partial<JobOffer>) => void;
-  deleteJobOffer: (id: string) => void;
-  addCandidate: (candidate: Omit<Candidate, 'id' | 'appliedAt'>) => void;
-  updateCandidate: (id: string, data: Partial<Candidate>) => void;
-  addObjective: (objective: Omit<Objective, 'id' | 'createdAt'>) => void;
-  updateObjective: (id: string, data: Partial<Objective>) => void;
-  deleteObjective: (id: string) => void;
-  addPerformanceReview: (review: Omit<PerformanceReview, 'id' | 'createdAt'>) => void;
-  updatePerformanceReview: (id: string, data: Partial<PerformanceReview>) => void;
-  addTimelineEvent: (event: Omit<TimelineEvent, 'id'>) => void;
-  updateEmployeeContract: (employeeId: string, contract: Contract) => void;
-  bankAccounts: BankAccount[];
-  transactions: BankTransaction[];
-  taxDeclarations: TaxDeclaration[];
-  courses: Course[];
-  enrollments: Enrollment[];
-  missions: Mission[];
-  expenses: ExpenseReport[];
-  jobPosts: JobPost[];
-  addBankAccount: (acc: Omit<BankAccount, 'id'>) => void;
-  addTransaction: (tx: Omit<BankTransaction, 'id'>) => void;
-  addTaxDeclaration: (d: Omit<TaxDeclaration, 'id'>) => void;
-  updateTaxDeclaration: (id: string, data: Partial<TaxDeclaration>) => void;
-  addCourse: (c: Omit<Course, 'id' | 'createdAt'>) => void;
-  enrollCourse: (employeeId: string, courseId: string) => void;
-  updateLessonProgress: (enrollmentId: string, lessonId: string) => void;
-  addMission: (m: Omit<Mission, 'id' | 'createdAt'>) => void;
-  updateMission: (id: string, data: Partial<Mission>) => void;
-  addExpense: (e: Omit<ExpenseReport, 'id'>) => void;
-  updateExpense: (id: string, data: Partial<ExpenseReport>) => void;
-  addJobPost: (p: Omit<JobPost, 'id' | 'createdAt'>) => void;
-  updateJobPost: (id: string, data: Partial<JobPost>) => void;
-  deleteJobPost: (id: string) => void;
-  meetings: Meeting[];
-  addMeeting: (meeting: Omit<Meeting, 'id' | 'createdAt' | 'status'>) => void;
-  addMeetingNote: (meetingId: string, note: Omit<MeetingNote, 'id' | 'createdAt'>) => void;
-  addMeetingTask: (meetingId: string, task: Omit<MeetingTask, 'id' | 'createdAt'>) => void;
-  updateMeeting: (id: string, data: Partial<Meeting>) => void;
-  updateMeetingTask: (meetingId: string, taskId: string, data: Partial<MeetingTask>) => void;
-  updateParticipantStatus: (meetingId: string, employeeId: string, status: ParticipantStatus) => void;
-  joinMeeting: (meetingId: string, employeeId: string) => void;
-  leaveMeeting: (meetingId: string, employeeId: string) => void;
-  // Coffre-fort
-  vaultItems: EmployeeVaultItem[];
-  addVaultItem: (item: Omit<EmployeeVaultItem, 'id'>) => void;
-  deleteVaultItem: (id: string) => void;
-  // Récompenses
-  rewardTransactions: RewardTransaction[];
-  rewardCatalog: RewardCatalog[];
-  addRewardTransaction: (tx: Omit<RewardTransaction, 'id' | 'createdAt'>) => void;
-  addRewardCatalogItem: (item: Omit<RewardCatalog, 'id'>) => void;
-  redeemReward: (employeeId: string, catalogItemId: string) => void;
-  // Matériel
-  equipment: Equipment[];
-  equipmentAssignments: EquipmentAssignment[];
-  addEquipment: (eq: Omit<Equipment, 'id'>) => void;
-  updateEquipment: (id: string, data: Partial<Equipment>) => void;
-  assignEquipment: (equipmentId: string, employeeId: string) => void;
-  returnEquipment: (equipmentId: string, condition?: 'good' | 'fair' | 'damaged') => void;
-  // Bien-être
-  wellnessSurveys: WellnessSurvey[];
-  wellnessResponses: WellnessResponse[];
-  addWellnessSurvey: (survey: Omit<WellnessSurvey, 'id' | 'createdAt'>) => void;
-  submitWellnessResponse: (response: Omit<WellnessResponse, 'id'>) => void;
-  // Banque salariale fintech
-  salaryAdvances: SalaryAdvance[];
-  salaryTransfers: SalaryTransfer[];
-  requestSalaryAdvance: (advance: Omit<SalaryAdvance, 'id' | 'requestedAt' | 'status' | 'repaymentStatus'>) => void;
-  approveSalaryAdvance: (id: string) => void;
-  paySalaryAdvance: (id: string) => void;
-  rejectSalaryAdvance: (id: string) => void;
-  addSalaryTransfer: (transfer: Omit<SalaryTransfer, 'id' | 'createdAt'>) => void;
-  // Quiz et certificats
-  quizzes: Quiz[];
-  quizAttempts: QuizAttempt[];
-  certificates: Certificate[];
-  addQuiz: (quiz: Omit<Quiz, 'id'>) => void;
-  submitQuizAttempt: (attempt: Omit<QuizAttempt, 'id' | 'startedAt' | 'completedAt' | 'passed'>) => QuizAttempt;
-  issueCertificate: (cert: Omit<Certificate, 'id' | 'issuedAt'>) => void;
-  // Signature électronique
-  signatureRequests: SignatureRequest[];
-  signatureTemplates: SignatureTemplate[];
-  sendSignatureRequest: (req: Omit<SignatureRequest, 'id' | 'initiatedAt' | 'status'>) => void;
-  signSignatureRequest: (requestId: string, recipientEmployeeId: string, signatureDataUrl: string) => void;
-  rejectSignature: (requestId: string, recipientEmployeeId: string, reason: string) => void;
-  addSignatureTemplate: (tpl: Omit<SignatureTemplate, 'id' | 'createdAt'>) => void;
-  deleteSignatureTemplate: (id: string) => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
 
-function AppInner({ children }: { children: ReactNode }) {
-  const auth = useAuth();
-  const data = useData();
+// Mock data for demo
+const mockCompany: Company = {
+  id: '1',
+  name: 'TechAfrique Solutions',
+  logo: '',
+  ownerFirstName: 'Kofi',
+  ownerLastName: 'Mensah',
+  email: 'admin@techafrique.com',
+  phone: '+228 90 12 34 56',
+  employeeCount: 25,
+  address: 'Lomé, Togo',
+  website: 'www.techafrique.com',
+  uniqueId: 'TA-2024-001',
+  createdAt: new Date('2024-01-15'),
+  balance: 5000000
+};
 
-  const login = useCallback(
-    (email: string, password: string, type: 'company' | 'employee'): boolean => {
-      const authResult = auth.login(email, password, type);
-      if (authResult) return true;
-      if (type === 'employee') {
-        const employee = data.employees.find((e) => e.email === email);
-        if (employee) {
-          auth.setCurrentUser(employee);
-          auth.setCurrentCompany(auth.defaultCompany);
-          return true;
-        }
-      }
-      return false;
-    },
-    [auth, data.employees],
-  );
+const mockEmployees: Employee[] = [
+  {
+    id: '1',
+    companyId: '1',
+    firstName: 'Kofi',
+    lastName: 'Mensah',
+    email: 'admin@techafrique.com',
+    phone: '+228 90 12 34 56',
+    dateOfBirth: new Date('1985-06-15'),
+    position: 'Directeur Général',
+    department: 'Direction',
+    photo: '',
+    salary: 1500000,
+    status: 'active',
+    joinDate: new Date('2024-01-15'),
+    role: 'admin'
+  },
+  {
+    id: '2',
+    companyId: '1',
+    firstName: 'Ama',
+    lastName: 'Gbeko',
+    email: 'ama@techafrique.com',
+    phone: '+228 91 23 45 67',
+    dateOfBirth: new Date('1990-03-20'),
+    position: 'Responsable RH',
+    department: 'Ressources Humaines',
+    photo: '',
+    salary: 800000,
+    status: 'active',
+    joinDate: new Date('2024-02-01'),
+    role: 'rh'
+  },
+  {
+    id: '3',
+    companyId: '1',
+    firstName: 'Kwame',
+    lastName: 'Adjei',
+    email: 'kwame@techafrique.com',
+    phone: '+228 92 34 56 78',
+    dateOfBirth: new Date('1992-08-10'),
+    position: 'Développeur Senior',
+    department: 'Informatique',
+    photo: '',
+    salary: 750000,
+    status: 'active',
+    joinDate: new Date('2024-03-15'),
+    role: 'manager'
+  },
+  {
+    id: '4',
+    companyId: '1',
+    firstName: 'Efua',
+    lastName: 'Asante',
+    email: 'efua@techafrique.com',
+    phone: '+228 93 45 67 89',
+    dateOfBirth: new Date('1988-12-05'),
+    position: 'Comptable',
+    department: 'Finance',
+    photo: '',
+    salary: 700000,
+    status: 'active',
+    joinDate: new Date('2024-04-01'),
+    role: 'employee'
+  },
+  {
+    id: '5',
+    companyId: '1',
+    firstName: 'Yaw',
+    lastName: 'Boakye',
+    email: 'yaw@techafrique.com',
+    phone: '+228 94 56 78 90',
+    dateOfBirth: new Date('1995-05-22'),
+    position: 'Designer UI/UX',
+    department: 'Marketing',
+    photo: '',
+    salary: 600000,
+    status: 'active',
+    joinDate: new Date('2024-05-15'),
+    role: 'employee'
+  },
+  {
+    id: '6',
+    companyId: '1',
+    firstName: 'Abla',
+    lastName: 'Dosso',
+    email: 'abla@techafrique.com',
+    phone: '+228 95 67 89 01',
+    dateOfBirth: new Date('1993-09-18'),
+    position: 'Chargé de Marketing',
+    department: 'Marketing',
+    photo: '',
+    salary: 550000,
+    status: 'inactive',
+    joinDate: new Date('2024-06-01'),
+    role: 'employee'
+  },
+  {
+    id: '7',
+    companyId: '1',
+    firstName: 'Kossi',
+    lastName: 'Amoussou',
+    email: 'kossi@techafrique.com',
+    phone: '+228 96 78 90 12',
+    dateOfBirth: new Date('1991-02-28'),
+    position: 'Développeur Full Stack',
+    department: 'Informatique',
+    photo: '',
+    salary: 700000,
+    status: 'active',
+    joinDate: new Date('2024-07-01'),
+    role: 'employee'
+  }
+];
 
-  const clockIn = useCallback((gpsLocation?: GPSLocation) => {
-    if (auth.currentUser) data.clockIn(auth.currentUser.id, gpsLocation);
-  }, [auth.currentUser, data]);
+const mockAttendance: Attendance[] = [
+  {
+    id: '1',
+    employeeId: '1',
+    date: new Date(),
+    checkIn: new Date(new Date().setHours(8, 0)),
+    breakStart: new Date(new Date().setHours(12, 0)),
+    breakEnd: new Date(new Date().setHours(13, 0)),
+    checkOut: null,
+    totalHours: 4,
+    overtime: 0,
+    status: 'present'
+  },
+  {
+    id: '2',
+    employeeId: '2',
+    date: new Date(),
+    checkIn: new Date(new Date().setHours(7, 45)),
+    breakStart: null,
+    breakEnd: null,
+    checkOut: null,
+    totalHours: 4.25,
+    overtime: 0,
+    status: 'present'
+  },
+  {
+    id: '3',
+    employeeId: '3',
+    date: new Date(),
+    checkIn: new Date(new Date().setHours(9, 15)),
+    breakStart: null,
+    breakEnd: null,
+    checkOut: null,
+    totalHours: 3,
+    overtime: 0,
+    status: 'late'
+  },
+  {
+    id: '4',
+    employeeId: '4',
+    date: new Date(),
+    checkIn: null,
+    breakStart: null,
+    breakEnd: null,
+    checkOut: null,
+    totalHours: 0,
+    overtime: 0,
+    status: 'absent'
+  },
+  {
+    id: '5',
+    employeeId: '5',
+    date: new Date(),
+    checkIn: new Date(new Date().setHours(8, 0)),
+    breakStart: new Date(new Date().setHours(12, 0)),
+    breakEnd: new Date(new Date().setHours(12, 45)),
+    checkOut: null,
+    totalHours: 4,
+    overtime: 0,
+    status: 'present'
+  }
+];
 
-  const startBreak = useCallback(() => {
-    if (auth.currentUser) data.startBreak(auth.currentUser.id);
-  }, [auth.currentUser, data]);
+const mockLeaves: Leave[] = [
+  {
+    id: '1',
+    employeeId: '3',
+    type: 'annual',
+    startDate: new Date('2024-12-20'),
+    endDate: new Date('2024-12-31'),
+    reason: 'Vacances de fin d\'année',
+    status: 'pending'
+  },
+  {
+    id: '2',
+    employeeId: '5',
+    type: 'sick',
+    startDate: new Date('2024-12-18'),
+    endDate: new Date('2024-12-19'),
+    reason: 'Grippe',
+    status: 'approved',
+    approvedBy: '1'
+  },
+  {
+    id: '3',
+    employeeId: '7',
+    type: 'annual',
+    startDate: new Date('2024-12-25'),
+    endDate: new Date('2024-12-27'),
+    reason: 'Congé personnel',
+    status: 'rejected'
+  }
+];
 
-  const endBreak = useCallback(() => {
-    if (auth.currentUser) data.endBreak(auth.currentUser.id);
-  }, [auth.currentUser, data]);
-
-  const clockOut = useCallback((gpsLocation?: GPSLocation) => {
-    if (auth.currentUser) data.clockOut(auth.currentUser.id, gpsLocation);
-  }, [auth.currentUser, data]);
-
-  const processPayment = useCallback(
-    (employeeId: string, amount: number): boolean => {
-      if (!auth.currentCompany || auth.currentCompany.balance < amount) return false;
-      const deducted = auth.withdraw(amount);
-      if (deducted) {
-        data.processPayment(employeeId, amount);
-        return true;
-      }
-      return false;
-    },
-    [auth, data],
-  );
-
-  const addNotification = useCallback(
-    (notification: Omit<Notification, 'id' | 'createdAt'>) => {
-      data.addNotification(notification);
-    },
-    [data],
-  );
-
-  const value: AppState = {
-    isLoggedIn: auth.isLoggedIn,
-    currentUser: auth.currentUser,
-    currentCompany: auth.currentCompany,
-    companies: auth.currentCompany ? [auth.currentCompany] : [],
-    employees: data.employees,
-    attendance: data.attendance,
-    leaves: data.leaves,
-    payslips: data.payslips,
-    documents: data.documents,
-    events: data.events,
-    conversations: data.conversations,
-    notifications: data.notifications,
-    invitations: data.invitations,
-    teams: data.teams,
-    posts: data.posts,
-    payrollConfig: data.payrollConfig,
-    signatures: data.signatures,
-    jobOffers: data.jobOffers,
-    candidates: data.candidates,
-    objectives: data.objectives,
-    performanceReviews: data.performanceReviews,
-    timelineEvents: data.timelineEvents,
-    bankAccounts: data.bankAccounts,
-    transactions: data.transactions,
-    taxDeclarations: data.taxDeclarations,
-    courses: data.courses,
-    enrollments: data.enrollments,
-    missions: data.missions,
-    expenses: data.expenses,
-    jobPosts: data.jobPosts,
-    meetings: data.meetings,
-    addDocument: data.addDocument,
-    deleteDocument: data.deleteDocument,
-    addEvent: data.addEvent,
-    addMessage: data.addMessage,
-    addConversation: data.addConversation,
-    readConversation: data.readConversation,
-    login,
-    logout: auth.logout,
-    registerCompany: auth.registerCompany,
-    addEmployee: data.addEmployee,
-    addMultipleEmployees: data.addMultipleEmployees,
-    updateEmployee: data.updateEmployee,
-    deleteEmployee: data.deleteEmployee,
-    sendInvitation: data.sendInvitation,
-    acceptInvitation: data.acceptInvitation,
-    clockIn,
-    startBreak,
-    endBreak,
-    clockOut,
-    requestLeave: data.requestLeave,
-    approveLeave: data.approveLeave,
-    rejectLeave: data.rejectLeave,
-    deposit: auth.deposit,
-    processPayment,
-    generatePayslip: data.generatePayslip,
-    markNotificationRead: data.markNotificationRead,
-    addNotification,
-    addTeam: data.addTeam,
-    updateTeam: data.updateTeam,
-    deleteTeam: data.deleteTeam,
-    addPost: data.addPost,
-    likePost: data.likePost,
-    addComment: data.addComment,
-    updatePayrollConfig: data.updatePayrollConfig,
-    signDocument: data.signDocument,
-    getSignatures: data.getSignatures,
-    addJobOffer: data.addJobOffer,
-    updateJobOffer: data.updateJobOffer,
-    deleteJobOffer: data.deleteJobOffer,
-    addCandidate: data.addCandidate,
-    updateCandidate: data.updateCandidate,
-    addObjective: data.addObjective,
-    updateObjective: data.updateObjective,
-    deleteObjective: data.deleteObjective,
-    addPerformanceReview: data.addPerformanceReview,
-    updatePerformanceReview: data.updatePerformanceReview,
-    addTimelineEvent: data.addTimelineEvent,
-    updateEmployeeContract: data.updateEmployeeContract,
-    addBankAccount: data.addBankAccount,
-    addTransaction: data.addTransaction,
-    addTaxDeclaration: data.addTaxDeclaration,
-    updateTaxDeclaration: data.updateTaxDeclaration,
-    addCourse: data.addCourse,
-    enrollCourse: data.enrollCourse,
-    updateLessonProgress: data.updateLessonProgress,
-    addMission: data.addMission,
-    updateMission: data.updateMission,
-    addExpense: data.addExpense,
-    updateExpense: data.updateExpense,
-    addJobPost: data.addJobPost,
-    updateJobPost: data.updateJobPost,
-    deleteJobPost: data.deleteJobPost,
-    addMeeting: data.addMeeting,
-    addMeetingNote: data.addMeetingNote,
-    addMeetingTask: data.addMeetingTask,
-    updateMeeting: data.updateMeeting,
-    updateMeetingTask: data.updateMeetingTask,
-    updateParticipantStatus: data.updateParticipantStatus,
-    joinMeeting: data.joinMeeting,
-    leaveMeeting: data.leaveMeeting,
-    vaultItems: data.vaultItems,
-    rewardTransactions: data.rewardTransactions,
-    rewardCatalog: data.rewardCatalog,
-    equipment: data.equipment,
-    equipmentAssignments: data.equipmentAssignments,
-    wellnessSurveys: data.wellnessSurveys,
-    wellnessResponses: data.wellnessResponses,
-    salaryAdvances: data.salaryAdvances,
-    salaryTransfers: data.salaryTransfers,
-    quizzes: data.quizzes,
-    quizAttempts: data.quizAttempts,
-    certificates: data.certificates,
-    addVaultItem: data.addVaultItem,
-    deleteVaultItem: data.deleteVaultItem,
-    addRewardTransaction: data.addRewardTransaction,
-    addRewardCatalogItem: data.addRewardCatalogItem,
-    redeemReward: data.redeemReward,
-    addEquipment: data.addEquipment,
-    updateEquipment: data.updateEquipment,
-    assignEquipment: data.assignEquipment,
-    returnEquipment: data.returnEquipment,
-    addWellnessSurvey: data.addWellnessSurvey,
-    submitWellnessResponse: data.submitWellnessResponse,
-    requestSalaryAdvance: data.requestSalaryAdvance,
-    approveSalaryAdvance: data.approveSalaryAdvance,
-    paySalaryAdvance: data.paySalaryAdvance,
-    rejectSalaryAdvance: data.rejectSalaryAdvance,
-    addSalaryTransfer: data.addSalaryTransfer,
-    addQuiz: data.addQuiz,
-    submitQuizAttempt: data.submitQuizAttempt,
-    issueCertificate: data.issueCertificate,
-    signatureRequests: data.signatureRequests,
-    signatureTemplates: data.signatureTemplates,
-    sendSignatureRequest: data.sendSignatureRequest,
-    signSignatureRequest: data.signSignatureRequest,
-    rejectSignature: data.rejectSignature,
-    addSignatureTemplate: data.addSignatureTemplate,
-    deleteSignatureTemplate: data.deleteSignatureTemplate,
-  };
-
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
-}
+const mockNotifications: Notification[] = [
+  {
+    id: '1',
+    userId: '1',
+    title: 'Nouvelle demande de congé',
+    message: 'Kwame Adjei a demandé un congé du 20 au 31 décembre',
+    type: 'leave',
+    read: false,
+    createdAt: new Date()
+  },
+  {
+    id: '2',
+    userId: '1',
+    title: 'Retard détecté',
+    message: 'Kwame Adjei est arrivé en retard à 9h15',
+    type: 'attendance',
+    read: false,
+    createdAt: new Date()
+  },
+  {
+    id: '3',
+    userId: '1',
+    title: 'Bulletin de paie disponible',
+    message: 'Les bulletins de paie de novembre sont prêts',
+    type: 'payslip',
+    read: true,
+    createdAt: new Date(Date.now() - 86400000)
+  }
+];
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<Employee | null>(null);
+  const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
+  const [employees, setEmployees] = useState<Employee[]>(mockEmployees);
+  const [attendance, setAttendance] = useState<Attendance[]>(mockAttendance);
+  const [leaves, setLeaves] = useState<Leave[]>(mockLeaves);
+  const [payslips, setPayslips] = useState<Payslip[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
+
+  const login = (email: string, _password: string, type: 'company' | 'employee'): boolean => {
+    if (type === 'company' && email === 'admin@techafrique.com') {
+      setCurrentCompany(mockCompany);
+      setCurrentUser(mockEmployees[0]);
+      setIsLoggedIn(true);
+      return true;
+    }
+    
+    const employee = employees.find(e => e.email === email);
+    if (employee) {
+      setCurrentUser(employee);
+      setCurrentCompany(mockCompany);
+      setIsLoggedIn(true);
+      return true;
+    }
+    
+    return false;
+  };
+
+  const logout = () => {
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    setCurrentCompany(null);
+  };
+
+  const registerCompany = (companyData: Omit<Company, 'id' | 'uniqueId' | 'createdAt' | 'balance'>) => {
+    const newCompany: Company = {
+      ...companyData,
+      id: String(companies.length + 1),
+      uniqueId: `EP-${Date.now().toString(36).toUpperCase()}`,
+      createdAt: new Date(),
+      balance: 0
+    };
+    setCurrentCompany(newCompany);
+    const adminEmployee: Employee = {
+      id: '1',
+      companyId: newCompany.id,
+      firstName: companyData.ownerFirstName,
+      lastName: companyData.ownerLastName,
+      email: companyData.email,
+      phone: companyData.phone,
+      dateOfBirth: new Date(),
+      position: 'Directeur Général',
+      department: 'Direction',
+      photo: companyData.logo,
+      salary: 0,
+      status: 'active',
+      joinDate: new Date(),
+      role: 'admin'
+    };
+    setCurrentUser(adminEmployee);
+    setIsLoggedIn(true);
+  };
+
+  const addEmployee = (employee: Omit<Employee, 'id'>) => {
+    const newEmployee: Employee = {
+      ...employee,
+      id: String(employees.length + 1)
+    };
+    setEmployees([...employees, newEmployee]);
+  };
+
+  const updateEmployee = (id: string, data: Partial<Employee>) => {
+    setEmployees(employees.map(e => e.id === id ? { ...e, ...data } : e));
+  };
+
+  const deleteEmployee = (id: string) => {
+    setEmployees(employees.filter(e => e.id !== id));
+  };
+
+  const sendInvitation = (email: string) => {
+    const newInvitation: Invitation = {
+      id: String(invitations.length + 1),
+      companyId: currentCompany?.id || '',
+      email,
+      status: 'pending',
+      sentAt: new Date()
+    };
+    setInvitations([...invitations, newInvitation]);
+    addNotification({
+      userId: currentUser?.id || '',
+      title: 'Invitation envoyée',
+      message: `Une invitation a été envoyée à ${email}`,
+      type: 'invitation',
+      read: false
+    });
+  };
+
+  const acceptInvitation = (id: string) => {
+    setInvitations(invitations.map(i => 
+      i.id === id ? { ...i, status: 'accepted' } : i
+    ));
+  };
+
+  const clockIn = () => {
+    const today = new Date();
+    const newAttendance: Attendance = {
+      id: String(attendance.length + 1),
+      employeeId: currentUser?.id || '',
+      date: today,
+      checkIn: today,
+      breakStart: null,
+      breakEnd: null,
+      checkOut: null,
+      totalHours: 0,
+      overtime: 0,
+      status: today.getHours() > 9 ? 'late' : 'present'
+    };
+    setAttendance([...attendance, newAttendance]);
+  };
+
+  const startBreak = () => {
+    const todayAttendance = attendance.find(
+      a => a.employeeId === currentUser?.id && 
+      new Date(a.date).toDateString() === new Date().toDateString()
+    );
+    if (todayAttendance) {
+      setAttendance(attendance.map(a => 
+        a.id === todayAttendance.id 
+          ? { ...a, breakStart: new Date() }
+          : a
+      ));
+    }
+  };
+
+  const endBreak = () => {
+    const todayAttendance = attendance.find(
+      a => a.employeeId === currentUser?.id && 
+      new Date(a.date).toDateString() === new Date().toDateString()
+    );
+    if (todayAttendance) {
+      setAttendance(attendance.map(a => 
+        a.id === todayAttendance.id 
+          ? { ...a, breakEnd: new Date() }
+          : a
+      ));
+    }
+  };
+
+  const clockOut = () => {
+    const todayAttendance = attendance.find(
+      a => a.employeeId === currentUser?.id && 
+      new Date(a.date).toDateString() === new Date().toDateString()
+    );
+    if (todayAttendance && todayAttendance.checkIn) {
+      const now = new Date();
+      const totalHours = (now.getTime() - todayAttendance.checkIn.getTime()) / (1000 * 60 * 60);
+      const overtime = totalHours > 8 ? totalHours - 8 : 0;
+      
+      setAttendance(attendance.map(a => 
+        a.id === todayAttendance.id 
+          ? { ...a, checkOut: now, totalHours: Math.round(totalHours * 100) / 100, overtime }
+          : a
+      ));
+    }
+  };
+
+  const requestLeave = (leave: Omit<Leave, 'id'>) => {
+    const newLeave: Leave = {
+      ...leave,
+      id: String(leaves.length + 1)
+    };
+    setLeaves([...leaves, newLeave]);
+    addNotification({
+      userId: currentUser?.id || '',
+      title: 'Demande de congé',
+      message: `Votre demande de congé a été soumise`,
+      type: 'leave',
+      read: false
+    });
+  };
+
+  const approveLeave = (id: string, comment?: string) => {
+    setLeaves(leaves.map(l => 
+      l.id === id ? { ...l, status: 'approved', approvedBy: currentUser?.id, approvalComment: comment } : l
+    ));
+  };
+
+  const rejectLeave = (id: string, comment?: string) => {
+    setLeaves(leaves.map(l => 
+      l.id === id ? { ...l, status: 'rejected', approvedBy: currentUser?.id, approvalComment: comment } : l
+    ));
+  };
+
+  const processPayment = (employeeId: string, amount: number) => {
+    const newPayslip: Payslip = {
+      id: String(payslips.length + 1),
+      employeeId,
+      month: new Date().getMonth() + 1,
+      year: new Date().getFullYear(),
+      basicSalary: amount,
+      bonuses: 0,
+      deductions: amount * 0.15,
+      netSalary: amount * 0.85,
+      generatedAt: new Date()
+    };
+    setPayslips([...payslips, newPayslip]);
+    
+    addNotification({
+      userId: employeeId,
+      title: 'Paiement effectué',
+      message: `Votre salaire de ${amount.toLocaleString()} FCFA a été versé`,
+      type: 'payment',
+      read: false
+    });
+  };
+
+  const generatePayslip = (employeeId: string) => {
+    const employee = employees.find(e => e.id === employeeId);
+    if (employee) {
+      const newPayslip: Payslip = {
+        id: String(payslips.length + 1),
+        employeeId,
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear(),
+        basicSalary: employee.salary,
+        bonuses: employee.salary * 0.1,
+        deductions: employee.salary * 0.15,
+        netSalary: employee.salary * 0.95,
+        generatedAt: new Date()
+      };
+      setPayslips([...payslips, newPayslip]);
+    }
+  };
+
+  const markNotificationRead = (id: string) => {
+    setNotifications(notifications.map(n => 
+      n.id === id ? { ...n, read: true } : n
+    ));
+  };
+
+  const markAllNotificationsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })));
+  };
+
+  const addNotification = (notification: Omit<Notification, 'id' | 'createdAt'>) => {
+    const newNotification: Notification = {
+      ...notification,
+      id: String(notifications.length + 1),
+      createdAt: new Date()
+    };
+    setNotifications([newNotification, ...notifications]);
+  };
+
+  const companies = [mockCompany];
+
   return (
-    <AuthProvider>
-      <DataProvider>
-        <AppInner>{children}</AppInner>
-      </DataProvider>
-    </AuthProvider>
+    <AppContext.Provider value={{
+      isLoggedIn,
+      currentUser,
+      currentCompany,
+      companies,
+      employees,
+      attendance,
+      leaves,
+      payslips,
+      notifications,
+      invitations,
+      login,
+      logout,
+      registerCompany,
+      addEmployee,
+      updateEmployee,
+      deleteEmployee,
+      sendInvitation,
+      acceptInvitation,
+      clockIn,
+      startBreak,
+      endBreak,
+      clockOut,
+      requestLeave,
+      approveLeave,
+      rejectLeave,
+      processPayment,
+      generatePayslip,
+      markAllNotificationsRead,
+      markNotificationRead,
+      addNotification
+    }}>
+      {children}
+    </AppContext.Provider>
   );
 }
 
 export function useApp() {
   const context = useContext(AppContext);
-  if (!context) throw new Error('useApp must be used within AppProvider');
+  if (!context) {
+    throw new Error('useApp must be used within an AppProvider');
+  }
   return context;
 }

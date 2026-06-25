@@ -3,15 +3,17 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import "./i18n";
 import App from "./App";
-import { ThemeProvider } from "./context/ThemeContext";
-import ErrorBoundary from "./components/ErrorBoundary";
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {
+      // Silently ignore — service worker is optional
+    });
+  });
+}
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ErrorBoundary>
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
-    </ErrorBoundary>
+    <App />
   </StrictMode>
 );

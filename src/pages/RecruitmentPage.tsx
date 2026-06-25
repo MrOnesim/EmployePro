@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import { Briefcase, Users, Plus, Edit2, Trash2, Search, Filter, Eye, Mail, Phone, Calendar as CalIcon } from 'lucide-react';
 import type { JobOffer, Candidate, CandidateStatus } from '../types';
@@ -20,9 +20,9 @@ const CANDIDATE_STATUS_MAP: Record<CandidateStatus, { variant: 'yellow' | 'blue'
 };
 
 export default function RecruitmentPage() {
-  const { jobOffers, candidates, addJobOffer, updateJobOffer, deleteJobOffer, addCandidate, updateCandidate } = useApp();
+  const { jobOffers, candidates, addJobOffer, updateJobOffer, deleteJobOffer, addCandidate, updateCandidate } = useData();
   const { addToast } = useToast();
-  const [tab, setTab] = useState<'offers' | 'candidates'>('offers');
+  const [tab, setTab] = useState<'offers' | 'candidates' | 'pipeline'>('offers');
   const [search, setSearch] = useState('');
   const [offerFilter, setOfferFilter] = useState('');
 
@@ -32,6 +32,10 @@ export default function RecruitmentPage() {
   const [showCandidateModal, setShowCandidateModal] = useState(false);
   const [candidateJobOfferId, setCandidateJobOfferId] = useState('');
   const [showDetailCandidate, setShowDetailCandidate] = useState<Candidate | null>(null);
+  const [showInterviewModal, setShowInterviewModal] = useState(false);
+  const [interviewCandidate, setInterviewCandidate] = useState<Candidate | null>(null);
+  const [interviewDate, setInterviewDate] = useState('');
+  const [interviewNotes, setInterviewNotes] = useState('');
 
   const [offerForm, setOfferForm] = useState({
     title: '', department: '', description: '', requirements: '',
@@ -130,6 +134,20 @@ export default function RecruitmentPage() {
     addToast('Statut mis à jour', 'success');
   };
 
+  const handleScheduleInterview = () => {
+    if (!interviewCandidate || !interviewDate) return;
+    updateCandidate(interviewCandidate.id, {
+      status: 'interview',
+      interviewDate: new Date(interviewDate),
+      notes: interviewNotes || interviewCandidate.notes,
+    });
+    setShowInterviewModal(false);
+    setInterviewCandidate(null);
+    setInterviewDate('');
+    setInterviewNotes('');
+    addToast('Entretien programmé', 'success');
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -155,6 +173,14 @@ export default function RecruitmentPage() {
           }`}
         >
           <Users size={18} /><span>Candidatures</span>
+        </button>
+        <button
+          onClick={() => setTab('pipeline')}
+          className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            tab === 'pipeline' ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-800'
+          }`}
+        >
+          <Filter size={18} /><span>Pipeline</span>
         </button>
       </div>
 
@@ -272,6 +298,10 @@ export default function RecruitmentPage() {
                           <option key={key} value={key}>{val.label}</option>
                         ))}
                       </select>
+                      <button onClick={() => { setInterviewCandidate(candidate); setInterviewDate(''); setInterviewNotes(''); setShowInterviewModal(true); }}
+                        className="flex items-center space-x-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm hover:bg-blue-100 transition-colors">
+                        <CalIcon size={14} /><span>Entretien</span>
+                      </button>
                       <button onClick={() => setShowDetailCandidate(candidate)}
                         className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                         <Eye size={18} />
@@ -289,6 +319,78 @@ export default function RecruitmentPage() {
           </div>
         </>
       )}
+
+      {tab === 'pipeline' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {(['received', 'interview', 'accepted', 'rejected'] as const).map(statusKey => {
+            const s = CANDIDATE_STATUS_MAP[statusKey];
+            const items = candidates
+              .filter(c => c.status === statusKey)
+              .sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime());
+            return (
+              <div key={statusKey} className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${
+                      statusKey === 'received' ? 'bg-yellow-400' :
+                      statusKey === 'interview' ? 'bg-blue-400' :
+                      statusKey === 'accepted' ? 'bg-green-400' : 'bg-red-400'
+                    }`} />
+                    <h3 className="font-semibold text-gray-700 dark:text-gray-300 text-sm">{s.label}</h3>
+                  </div>
+                  <span className="text-xs text-gray-400 font-medium bg-white dark:bg-gray-700 px-2 py-0.5 rounded-full">{items.length}</span>
+                </div>
+                <div className="space-y-2 min-h-[200px]">
+                  {items.map(candidate => {
+                    const offer = jobOffers.find(o => o.id === candidate.jobOfferId);
+                    return (
+                      <div key={candidate.id} className="bg-white dark:bg-gray-700 rounded-lg p-3 shadow-sm border border-gray-100 dark:border-gray-600 cursor-pointer hover:shadow-md transition-shadow"
+                        onClick={() => setShowDetailCandidate(candidate)}
+                      >
+                        <p className="font-medium text-gray-800 dark:text-gray-200 text-sm">{candidate.firstName} {candidate.lastName}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{offer?.title || 'Offre inconnue'}</p>
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="text-xs text-gray-400">{new Date(candidate.appliedAt).toLocaleDateString()}</span>
+                          {candidate.interviewDate && (
+                            <span className="text-xs text-blue-500 font-medium">{new Date(candidate.interviewDate).toLocaleDateString()}</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {items.length === 0 && (
+                    <p className="text-xs text-gray-400 text-center py-6">Aucun candidat</p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Interview Modal */}
+      <Modal open={showInterviewModal} onClose={() => setShowInterviewModal(false)} title="Programmer un entretien" maxWidth="md">
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm text-gray-500 mb-1">Candidat</p>
+            <p className="font-medium text-gray-800">{interviewCandidate?.firstName} {interviewCandidate?.lastName}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Date et heure de l'entretien *</label>
+            <input type="datetime-local" value={interviewDate} onChange={e => setInterviewDate(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Notes pour l'entretien</label>
+            <textarea value={interviewNotes} onChange={e => setInterviewNotes(e.target.value)}
+              rows={3} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="Questions à poser, points à évaluer..." />
+          </div>
+          <div className="flex space-x-3">
+            <button onClick={() => setShowInterviewModal(false)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200">Annuler</button>
+            <button onClick={handleScheduleInterview} className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700">Programmer</button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal open={showCreateOffer} onClose={() => setShowCreateOffer(false)} title="Nouvelle offre d'emploi" maxWidth="lg">
         <div className="space-y-4">

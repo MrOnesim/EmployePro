@@ -13,7 +13,7 @@ const examples = [
     icon: FileText,
     question: 'Génère le rapport RH du mois dernier.',
     answer:
-      'Rapport généré : 14 recrutements, 98.2% présence, 2.4M FCFA masse salariale. Envoyé par email.',
+      'Rapport généré : 14 recrutements, 98.2% présence, 2.4M € masse salariale. Envoyé par email.',
     delay: 200,
   },
   {
@@ -28,15 +28,18 @@ export default function AISection() {
   const { ref, isVisible } = useScrollReveal();
 
   return (
-    <section className="py-28 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+    <section
+      id="ai-section"
+      className="py-28 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden"
+    >
       <div
         ref={ref}
         className={`relative max-w-7xl mx-auto px-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
       >
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 border border-purple-100 mb-6">
-            <Sparkles size={14} className="text-purple-600" />
-            <span className="text-sm font-medium text-purple-600">Assistant IA</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 ring-1 ring-blue-200 shadow-sm mb-6">
+            <Sparkles size={14} className="text-blue-600" />
+            <span className="text-sm font-medium text-blue-600">Assistant IA</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-black text-gray-800 mb-4 tracking-tight">
             Votre assistant RH intelligent
@@ -48,15 +51,15 @@ export default function AISection() {
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-t-3xl p-6 border border-gray-200 border-b-0">
+          <div className="bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 rounded-t-3xl p-6 border border-gray-200 border-b-0">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg">
                 <Bot size={24} className="text-white" />
               </div>
               <div>
                 <div className="font-semibold text-gray-800">Assistant RH</div>
-                <div className="flex items-center gap-1.5 text-sm text-green-600">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <div className="flex items-center gap-1.5 text-sm text-blue-600">
+                  <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
                   En ligne — IA active
                 </div>
               </div>
@@ -84,13 +87,13 @@ export default function AISection() {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shrink-0 shadow-sm">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shrink-0 shadow-sm">
                     <Bot size={16} className="text-white" />
                   </div>
                   <div className="bg-gray-50 rounded-2xl rounded-bl-sm px-5 py-3 max-w-[80%] border border-gray-100">
                     <div className="flex items-center gap-2 mb-1">
-                      <Sparkles size={12} className="text-purple-500" />
-                      <span className="text-xs text-purple-600 font-medium">Assistant IA</span>
+                      <Sparkles size={12} className="text-blue-500" />
+                      <span className="text-xs text-blue-600 font-medium">Assistant IA</span>
                     </div>
                     <p className="text-sm text-gray-600">{ex.answer}</p>
                   </div>

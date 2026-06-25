@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import { BookOpen, Play, CheckCircle, Clock, User, BarChart3, Plus, Search, ClipboardCheck, Award, GraduationCap, ChevronRight, FileDown, XCircle } from 'lucide-react';
 import Modal from '../components/Modal';
@@ -25,7 +26,8 @@ function getCategoryVariant(category: string): 'blue' | 'green' | 'yellow' | 're
 }
 
 export default function TrainingPage() {
-  const { courses, enrollments, currentUser, enrollCourse, updateLessonProgress, quizzes, certificates, submitQuizAttempt } = useApp();
+  const { currentUser } = useApp();
+  const { courses, enrollments, enrollCourse, updateLessonProgress, quizzes, certificates, submitQuizAttempt } = useData();
   const { addToast } = useToast();
 
   const [activeTab, setActiveTab] = useState<'catalogue' | 'my' | 'quiz' | 'certificates'>('catalogue');

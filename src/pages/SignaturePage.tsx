@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import { FileSignature, Send, Plus, X, FileText, CheckCircle, Ban, AlertTriangle } from 'lucide-react';
 import Badge from '../components/Badge';
@@ -26,7 +27,8 @@ const DTYPE_LABELS: Record<string, string> = {
 };
 
 export default function SignaturePage() {
-  const { signatureRequests, signatureTemplates, sendSignatureRequest, signSignatureRequest, rejectSignature, addSignatureTemplate, deleteSignatureTemplate, employees, currentUser } = useApp();
+  const { currentUser } = useApp();
+  const { signatureRequests, signatureTemplates, sendSignatureRequest, signSignatureRequest, rejectSignature, addSignatureTemplate, deleteSignatureTemplate, employees } = useData();
   const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState<'requests' | 'templates'>('requests');
   const [showSendModal, setShowSendModal] = useState(false);

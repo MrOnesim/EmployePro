@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import { FileText, Landmark, Plus, Download, CheckCircle, Clock, AlertTriangle, Search, Filter } from 'lucide-react';
 import Modal from '../components/Modal';
@@ -82,7 +83,8 @@ function downloadCsv(declaration: TaxDeclaration) {
 }
 
 export default function TaxPage() {
-  const { taxDeclarations, employees, currentCompany, addTaxDeclaration } = useApp();
+  const { currentCompany } = useApp();
+  const { taxDeclarations, employees, addTaxDeclaration } = useData();
   const { addToast } = useToast();
 
   const [showModal, setShowModal] = useState(false);

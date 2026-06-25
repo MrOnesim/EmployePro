@@ -31,7 +31,7 @@ export default function FooterSection() {
 
       {/* Decorative orbs */}
       <div className="absolute top-20 left-20 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 right-20 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 right-20 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl" />
 
       <div className="relative max-w-7xl mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
@@ -41,9 +41,10 @@ export default function FooterSection() {
               <img
                 src="/images/logo.png"
                 alt="EmployéPro"
+                loading="lazy"
                 className="w-10 h-10 rounded-xl object-cover"
               />
-              <span className="text-xl font-bold text-white">EmployéPro Africa</span>
+              <span className="text-xl font-bold text-white">EmployéPro</span>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-6 max-w-sm">
               La plateforme RH et paie tout-en-un pour les entreprises ambitieuses. Paie multi-pays,
@@ -120,7 +121,7 @@ export default function FooterSection() {
         {/* Bottom bar */}
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} EmployéPro Africa. Tous droits réservés.
+            &copy; {new Date().getFullYear()} EmployéPro. Tous droits réservés.
           </p>
           <div className="flex items-center gap-4 text-xs text-gray-600">
             <span>RGPD conform</span>

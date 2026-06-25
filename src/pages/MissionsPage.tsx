@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import {
   Plane, Receipt, Plus, CheckCircle, XCircle, MapPin, Calendar, DollarSign, FileText
@@ -48,7 +49,8 @@ const expenseCategories = [
 ];
 
 export default function MissionsPage() {
-  const { currentUser, employees, missions, expenses, addMission, updateMission, addExpense, updateExpense } = useApp();
+  const { currentUser } = useApp();
+  const { employees, missions, expenses, addMission, updateMission, addExpense, updateExpense } = useData();
   const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState<'missions' | 'expenses'>('missions');
 

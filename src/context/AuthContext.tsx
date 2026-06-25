@@ -1,14 +1,17 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from 'react';
 import type { Company, Employee } from '../types';
+import { isAuthenticated, clearTokens } from '../lib/axios';
+import * as authService from '../services/authService';
 
 interface AuthState {
   isLoggedIn: boolean;
   currentUser: Employee | null;
   currentCompany: Company | null;
   defaultCompany: Company;
-  login: (email: string, _password: string, type: 'company' | 'employee') => boolean;
-  logout: () => void;
-  registerCompany: (company: Omit<Company, 'id' | 'uniqueId' | 'createdAt' | 'balance'>) => void;
+  useApi: boolean;
+  login: (email: string, _password: string, type: 'company' | 'employee') => Promise<boolean> | boolean;
+  logout: () => Promise<void> | void;
+  registerCompany: (data: Omit<Company, 'id' | 'uniqueId' | 'createdAt' | 'balance'>) => Promise<void> | void;
   setCurrentUser: (user: Employee | null) => void;
   setCurrentCompany: (company: Company | null) => void;
   deposit: (amount: number) => void;
@@ -51,22 +54,51 @@ const mockAdmin: Employee = {
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const useApi = import.meta.env.VITE_API_BASE_URL ? true : false;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState<Employee | null>(null);
   const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
 
-  const login = (email: string, _password: string, type: 'company' | 'employee'): boolean => {
+  const hydrateFromToken = useCallback(async () => {
+    if (!useApi || !isAuthenticated()) return;
+    try {
+      const profile = await authService.getProfile();
+      setCurrentUser(profile.user);
+      setCurrentCompany(profile.company);
+      setIsLoggedIn(true);
+    } catch {
+      clearTokens();
+    }
+  }, [useApi]);
+
+  useEffect(() => { hydrateFromToken(); }, [hydrateFromToken]);
+
+  const login = async (email: string, _password: string, type: 'company' | 'employee'):
+    Promise<boolean> => {
+    if (useApi) {
+      try {
+        const res = await authService.login({ email, password: _password, type });
+        setCurrentUser(res.user);
+        setCurrentCompany(res.company);
+        setIsLoggedIn(true);
+        return true;
+      } catch {
+        return false;
+      }
+    }
     if (type === 'company' && email === 'admin@techafrique.com') {
       setCurrentCompany(defaultCompany);
       setCurrentUser(mockAdmin);
       setIsLoggedIn(true);
       return true;
     }
-    // Employee login is handled by parent DataContext providing the employees list
     return false;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (useApi) {
+      try { await authService.logout(); } catch { clearTokens(); }
+    }
     setIsLoggedIn(false);
     setCurrentUser(null);
     setCurrentCompany(null);
@@ -86,7 +118,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return success;
   };
 
-  const registerCompany = (companyData: Omit<Company, 'id' | 'uniqueId' | 'createdAt' | 'balance'>) => {
+  const registerCompany = async (companyData: Omit<Company, 'id' | 'uniqueId' | 'createdAt' | 'balance'>) => {
+    if (useApi) {
+      try {
+        const res = await authService.registerCompany({
+          ownerFirstName: companyData.ownerFirstName,
+          ownerLastName: companyData.ownerLastName,
+          email: companyData.email,
+          phone: companyData.phone,
+          name: companyData.name,
+          address: companyData.address,
+          website: companyData.website,
+        });
+        setCurrentUser(res.user);
+        setCurrentCompany(res.company);
+        setIsLoggedIn(true);
+        return;
+      } catch {
+        return;
+      }
+    }
     const newCompany: Company = {
       ...companyData,
       id: String(Date.now()),
@@ -122,6 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         currentUser,
         currentCompany,
         defaultCompany,
+        useApi,
         login,
         logout,
         registerCompany,

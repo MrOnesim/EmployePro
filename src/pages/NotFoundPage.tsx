@@ -3,7 +3,7 @@ import { Home, ArrowLeft } from 'lucide-react';
 
 export default function NotFoundPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         <div className="text-9xl font-black text-blue-600 mb-4">404</div>
         <h1 className="text-2xl font-bold text-gray-800 mb-2">Page introuvable</h1>

@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import { Users, Plus, Trash2, Edit3 } from 'lucide-react';
 import Modal from '../components/Modal';
 import Avatar from '../components/Avatar';
 
 export default function TeamsPage() {
-  const { teams, employees, addTeam, updateTeam, deleteTeam } = useApp();
+  const { teams, employees, addTeam, updateTeam, deleteTeam } = useData();
   const { addToast } = useToast();
   const [showCreate, setShowCreate] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);

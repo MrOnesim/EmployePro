@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import {
   Building2, Smartphone, Plus, ArrowUpRight, ArrowDownLeft,
@@ -38,7 +39,8 @@ const DEFAULT_BANK_ACCOUNT: Omit<BankAccount, 'id'> = {
 };
 
 export default function BankingPage() {
-  const { bankAccounts, transactions, currentCompany, addBankAccount } = useApp();
+  const { currentCompany } = useApp();
+  const { bankAccounts, transactions, addBankAccount } = useData();
   const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState<'accounts' | 'transactions'>('accounts');
   const [showModal, setShowModal] = useState(false);

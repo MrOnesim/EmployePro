@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { 
-  Star, TrendingUp, Target, Search, Plus,
+  Star, TrendingUp, Target, Search, Plus, X,
   CheckCircle, Clock, ThumbsUp, Trophy, Eye
 } from 'lucide-react';
-import Modal from '../components/Modal';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
 
 interface Performance {
@@ -25,45 +24,45 @@ const mockPerformances: Record<string, Performance> = {
     strengths: ['Excellente communication', 'Organisation impeccable', 'Leadership naturel'],
     areasToImprove: ['Déléguer plus efficacement', 'Gestion du temps'],
     goals: [{ title: 'Former un nouveau recruteur', completed: true }, { title: 'Créer un processus d\'onboarding', completed: true }, { title: 'Réduire le turnover de 10%', completed: false }],
-    rating: 8.5, lastReview: new Date('2024-11-15'), badges: ['MENTOR', 'ÉTOILE', 'TEAMWORK']
+    rating: 8.5, lastReview: new Date('2024-11-15'), badges: ['🏆 MENTOR', '⭐ ÉTOILE', '🤝 TEAMWORK']
   },
   '3': {
     employeeId: '3', scores: { communication: 7, organisation: 9, leadership: 6, teamwork: 8, adaptabilité: 9 },
     strengths: ['Compétences techniques exceptionnelles', 'Très organisé', 'Adaptable'],
     areasToImprove: ['Présentation devant groupe', 'Documentation du code'],
     goals: [{ title: 'Mentor un développeur junior', completed: true }, { title: 'Refactorer le module paie', completed: true }, { title: 'Obtenir cert AWS', completed: false }],
-    rating: 8.2, lastReview: new Date('2024-11-20'), badges: ['TECH LEAD', 'INNOVATION']
+    rating: 8.2, lastReview: new Date('2024-11-20'), badges: ['💻 TECH LEAD', '🚀 INNOVATION']
   },
   '4': {
     employeeId: '4', scores: { communication: 8, organisation: 9, leadership: 6, teamwork: 8, adaptabilité: 7 },
     strengths: ['Précision financière', 'Reporting rigoureux', 'Fiabilité'],
     areasToImprove: ['Initiative', 'Collaboration inter-département'],
     goals: [{ title: 'Automatiser les rapports mensuels', completed: true }, { title: 'Former sur le nouveau logiciel', completed: false }],
-    rating: 7.8, lastReview: new Date('2024-10-25'), badges: ['PRÉCISION']
+    rating: 7.8, lastReview: new Date('2024-10-25'), badges: ['📊 PRÉCISION']
   },
   '5': {
     employeeId: '5', scores: { communication: 8, organisation: 7, leadership: 5, teamwork: 9, adaptabilité: 8 },
     strengths: ['Créativité', 'Design intuitif', 'Collaboration'],
     areasToImprove: ['Gestion des délais', 'Présentation de projets'],
     goals: [{ title: 'Refonte UI de l\'app', completed: true }, { title: 'Créer le design system', completed: true }, { title: 'Former l\'équipe UX', completed: false }],
-    rating: 8.0, lastReview: new Date('2024-11-10'), badges: ['CRÉATIVITÉ', 'ÉTOILE']
+    rating: 8.0, lastReview: new Date('2024-11-10'), badges: ['🎨 CRÉATIVITÉ', '⭐ ÉTOILE']
   },
   '7': {
     employeeId: '7', scores: { communication: 7, organisation: 8, leadership: 5, teamwork: 8, adaptabilité: 9 },
     strengths: ['Polyvalence Full Stack', 'Résolution de bugs', 'Apprentissage rapide'],
     areasToImprove: ['Leadership technique', 'Code review'],
     goals: [{ title: 'Déployer microservices', completed: false }, { title: 'Mentor le stage', completed: true }],
-    rating: 7.5, lastReview: new Date('2024-12-01'), badges: ['BUG BUSTER']
+    rating: 7.5, lastReview: new Date('2024-12-01'), badges: ['🔧 BUG BUSTER']
   }
 };
 
 export default function PerformancePage() {
   const { employees } = useApp();
   const { addToast } = useToast();
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null);
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [newGoal, setNewGoal] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const activeEmployees = employees.filter(e => e.status === 'active' && e.role === 'employee');
 
@@ -365,19 +364,32 @@ export default function PerformancePage() {
         </>
       )}
 
-      <Modal open={showAddGoal} onClose={() => setShowAddGoal(false)} title="Nouvel objectif">
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Objectif *</label>
-            <input type="text" value={newGoal} onChange={(e) => setNewGoal(e.target.value)}
-              placeholder="Décrire l'objectif..."
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" />
+      {/* Add Goal Modal */}
+      {showAddGoal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">Nouvel objectif</h2>
+              <button onClick={() => setShowAddGoal(false)} className="text-gray-400 hover:text-gray-600"><X size={24} /></button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Objectif *</label>
+                <input
+                  type="text"
+                  value={newGoal}
+                  onChange={(e) => setNewGoal(e.target.value)}
+                  placeholder="Décrire l'objectif..."
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                />
+              </div>
+              <button onClick={handleAddGoal} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700">
+                Ajouter l'objectif
+              </button>
+            </div>
           </div>
-          <button onClick={handleAddGoal} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700">
-            Ajouter l'objectif
-          </button>
         </div>
-      </Modal>
+      )}
     </div>
   );
 }
